@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Shadow Chat</title>
+    <meta name="theme-color" content="#111111">
+    <link rel="stylesheet" href="style.css?v=13">
+</head>
+<body>
+
+<div id="loginScreen" class="login-screen">
+    <div class="login-card">
+        <div class="login-logo">Shadow Chat</div>
+        <input type="text" id="usernameInput" placeholder="Username">
+        <input type="password" id="passwordInput" placeholder="Парола">
+        <div class="login-actions">
+            <button id="loginBtn">Вход</button>
+            <button id="registerBtn" class="secondary-btn">Регистрация</button>
+        </div>
+        <div id="loginStatus" class="login-status"></div>
+    </div>
+</div>
+
+<div id="app" class="hidden">
+    <section id="chatListScreen" class="screen active">
+        <header class="topbar">
+            <div class="topbar-left">
+                <div id="myAvatarBtn" class="avatar big-avatar clickable-avatar">?</div>
+                <div class="topbar-user">
+                    <div id="myUsernameLabel" class="topbar-title">Shadow Chat</div>
+                    <div id="myInviteCodeLabel" class="topbar-subtitle">Invite code: -</div>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <button id="openMenuBtn" class="icon-btn">☰</button>
+            </div>
+        </header>
+
+        <div id="sideMenu" class="side-menu hidden">
+            <div class="menu-card">
+                <div class="menu-title">Меню</div>
+
+                <label class="menu-item upload-label">
+                    <span>Смени аватар</span>
+                    <input type="file" id="avatarFileInput" accept="image/*" hidden>
+                </label>
+
+                <div class="menu-item action-item" id="openInviteModalBtn">Покани приятел</div>
+                <div class="menu-item action-item" id="createGroupBtn">Създай група</div>
+
+                <label class="menu-item toggle-row">
+                    <span>Покажи receipt статуси</span>
+                    <input type="checkbox" id="receiptsToggle">
+                </label>
+
+                <label class="menu-item toggle-row">
+                    <span>Покажи online статус</span>
+                    <input type="checkbox" id="onlineVisibilityToggle">
+                </label>
+
+                <div class="menu-item action-item" id="logoutBtn">Logout</div>
+            </div>
+        </div>
+
+        <div class="list-tools">
+            <div class="search-row">
+                <input type="text" id="contactSearchInput" placeholder="Търси чат...">
+            </div>
+
+            <div class="invite-row">
+                <input type="text" id="inviteCodeInput" placeholder="Invite code">
+                <button id="addContactBtn">Add</button>
+            </div>
+        </div>
+
+        <div class="section-title">Чатове</div>
+        <div id="chatList" class="chat-list"></div>
+    </section>
+
+    <section id="chatRoomScreen" class="screen">
+        <header class="chat-header">
+            <div class="chat-header-left">
+                <button id="backBtn" class="icon-btn back-btn">←</button>
+                <div id="activeAvatar" class="avatar header-avatar">?</div>
+                <div class="chat-header-user">
+                    <div id="activeContactName" class="chat-header-name">Контакт</div>
+                    <div id="activeContactSub" class="chat-header-sub">Чат</div>
+                </div>
+            </div>
+
+            <div class="chat-header-right">
+                <button id="refreshChatBtn" class="icon-btn">⟳</button>
+            </div>
+        </header>
+
+        <div class="chat-room-body">
+            <div class="panel-title-row">
+                <div class="panel-title">Кодирани</div>
+                <div class="panel-title">Разкодиран чат</div>
+            </div>
+
+            <div class="chat-panels">
+                <div id="encodedPanel" class="panel encoded-panel">
+                    <div id="encodedMessages" class="message-column"></div>
+                </div>
+
+                <div id="decodedPanel" class="panel decoded-panel">
+                    <div id="chatMessages" class="message-column"></div>
+                </div>
+            </div>
+
+            <button id="scrollToBottomBtn" class="scroll-to-bottom hidden">↓</button>
+        </div>
+
+        <div class="composer-wrap">
+            <div id="replyBar" class="reply-bar hidden">
+                <div class="reply-bar-left">
+                    <div class="reply-bar-title">Reply</div>
+                    <div id="replyPreviewText" class="reply-bar-text"></div>
+                </div>
+                <button id="clearReplyBtn" class="reply-close-btn">✕</button>
+            </div>
+
+            <div class="composer-box">
+                <button
+                    id="openEmojiPickerBtn"
+                    class="quick-tool-btn"
+                    type="button"
+                    aria-label="Отвори emoji"
+                    title="Emoji"
+                >😊</button>
+
+                <textarea id="messageInput" placeholder="Пиши тук..."></textarea>
+
+                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                    <button
+                        id="recordVoiceBtn"
+                        class="quick-tool-btn"
+                        type="button"
+                        aria-label="Гласово съобщение"
+                        title="Гласово"
+                    >🎤</button>
+
+                    <button
+                        id="attachCameraBtn"
+                        class="quick-tool-btn"
+                        type="button"
+                        aria-label="Камера"
+                        title="Камера"
+                    >📷</button>
+
+                    <button
+                        id="attachImageBtn"
+                        class="quick-tool-btn"
+                        type="button"
+                        aria-label="Качи снимка"
+                        title="Снимка"
+                    >🖼</button>
+
+                    <button
+                        id="attachFileBtn"
+                        class="quick-tool-btn"
+                        type="button"
+                        aria-label="Качи файл"
+                        title="Файл"
+                    >📎</button>
+
+                    <button id="sendBtn" class="send-btn">➤</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="groupModal" class="modal hidden">
+    <div class="modal-card">
+        <div class="modal-title">Създай група</div>
+
+        <input type="text" id="groupNameInput" placeholder="Име на групата">
+
+        <div class="modal-subtitle">Избери участници</div>
+        <div id="groupMembersList" class="group-members-list"></div>
+
+        <div class="modal-actions">
+            <button id="cancelGroupBtn" class="secondary-btn modal-btn">Отказ</button>
+            <button id="confirmGroupBtn" class="modal-btn">Създай</button>
+        </div>
+    </div>
+</div>
+
+<div id="inviteModal" class="modal hidden">
+    <div class="modal-card">
+        <div class="modal-title">Покани приятел</div>
+
+        <div style="display:flex; justify-content:center; margin-bottom:14px;">
+            <img
+                id="inviteQrImage"
+                alt="Invite QR"
+                style="width:220px; height:220px; border-radius:18px; background:#fff; padding:10px; object-fit:contain;"
+            >
+        </div>
+
+        <div id="inviteLinkPreview" class="reply-bar" style="margin-bottom:12px;">
+            <div class="reply-bar-left">
+                <div class="reply-bar-title">Invite link</div>
+                <div id="inviteLinkText" class="reply-bar-text"></div>
+            </div>
+        </div>
+
+        <div id="inviteCodePreview" class="reply-bar" style="margin-bottom:12px;">
+            <div class="reply-bar-left">
+                <div class="reply-bar-title">Invite code</div>
+                <div id="inviteCodeText" class="reply-bar-text"></div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button id="copyInviteBtn" class="secondary-btn modal-btn">Копирай</button>
+            <button id="shareInviteBtn" class="modal-btn">Сподели</button>
+            <button id="closeInviteBtn" class="secondary-btn modal-btn">Затвори</button>
+        </div>
+    </div>
+</div>
+
+<div id="forwardModal" class="modal hidden">
+    <div class="modal-card">
+        <div class="modal-title">Препрати съобщение</div>
+
+        <div id="forwardPreviewBox" class="reply-bar" style="margin-bottom:12px;">
+            <div class="reply-bar-left">
+                <div class="reply-bar-title">Избрано съобщение</div>
+                <div id="forwardPreviewText" class="reply-bar-text"></div>
+            </div>
+        </div>
+
+        <input type="text" id="forwardSearchInput" placeholder="Търси чат или група...">
+
+        <div class="modal-subtitle" style="margin-top:12px;">Избери къде да се препрати</div>
+        <div id="forwardTargetsList" class="group-members-list"></div>
+
+        <div class="modal-actions">
+            <button id="cancelForwardBtn" class="secondary-btn modal-btn">Отказ</button>
+            <button id="confirmForwardBtn" class="modal-btn">Препрати</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmModal" class="modal hidden">
+    <div class="modal-card confirm-modal-card">
+        <div id="confirmModalTitle" class="modal-title">Потвърждение</div>
+
+        <div id="confirmPreviewBox" class="reply-bar confirm-preview-box">
+            <div class="reply-bar-left">
+                <div id="confirmModalSubtitle" class="reply-bar-title">Сигурен ли си?</div>
+                <div id="confirmModalText" class="reply-bar-text"></div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button id="cancelConfirmBtn" class="secondary-btn modal-btn">Отказ</button>
+            <button id="confirmActionBtn" class="modal-btn danger-btn">Потвърди</button>
+        </div>
+    </div>
+</div>
+
+<div id="imageViewer" class="image-viewer hidden">
+    <div class="image-viewer-inner">
+        <button id="closeImageViewerBtn" class="image-viewer-close">✕</button>
+        <img id="imageViewerImg" src="" alt="preview">
+    </div>
+</div>
+
+<div id="messageMenu" class="message-menu hidden"></div>
+<div id="emojiPicker" class="emoji-picker hidden"></div>
+
+<script src="dictionary.js?v=13"></script>
+<script src="js/config.js?v=13"></script>
+<script src="js/storage.js?v=13"></script>
+<script src="js/api.js?v=13"></script>
+<script src="js/state.js?v=13"></script>
+<script src="js/dom.js?v=13"></script>
+<script src="js/utils.js?v=13"></script>
+<script src="js/copy.js?v=13"></script>
+<script src="js/invite.js?v=13"></script>
+<script src="js/auth.js?v=13"></script>
+<script src="js/ui.js?v=13"></script>
+<script src="js/avatars.js?v=13"></script>
+<script src="js/profile.js?v=13"></script>
+<script src="js/chats.js?v=13"></script>
+<script src="js/groups.js?v=13"></script>
+<script src="js/reply.js?v=13"></script>
+<script src="js/forward.js?v=13"></script>
+<script src="js/menu.js?v=13"></script>
+<script src="js/files.js?v=13"></script>
+<script src="js/scroll.js?v=13"></script>
+<script src="js/image-tools.js?v=13"></script>
+<script src="js/audio-tools.js?v=13"></script>
+<script src="js/uploads.js?v=13"></script>
+<script src="js/polling.js?v=13"></script>
+<script src="js/conversation.js?v=13"></script>
+<script src="js/render.js?v=13"></script>
+<script src="js/reactions.js?v=13"></script>
+<script src="js/send.js?v=13"></script>
+<script src="js/events.js?v=13"></script>
+<script src="js/app.js?v=13"></script>
+<script src="script.js?v=13"></script>
+
+</body>
+</html>
