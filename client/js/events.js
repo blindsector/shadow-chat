@@ -29,6 +29,36 @@ function closeComposerEmojiPicker() {
     emojiPicker.classList.add("hidden");
 }
 
+function closeComposerToolsMenu() {
+    if (!composerToolsMenu) return;
+    composerToolsMenu.classList.add("hidden");
+}
+
+function toggleComposerToolsMenu() {
+    if (!composerToolsMenu || !composerMoreBtn) return;
+
+    const willOpen = composerToolsMenu.classList.contains("hidden");
+
+    if (!willOpen) {
+        closeComposerToolsMenu();
+        return;
+    }
+
+    closeComposerEmojiPicker();
+    composerToolsMenu.classList.remove("hidden");
+}
+
+function syncComposerToolsVisibility() {
+    if (!composerBox || !messageInput) return;
+
+    const hasText = !!messageInput.value.trim();
+    composerBox.classList.toggle("composer-has-text", hasText);
+
+    if (hasText) {
+        closeComposerToolsMenu();
+    }
+}
+
 function positionComposerEmojiPicker() {
     if (!emojiPicker || !openEmojiPickerBtn) return;
 
@@ -92,6 +122,7 @@ function toggleComposerEmojiPicker() {
         return;
     }
 
+    closeComposerToolsMenu();
     emojiPicker.classList.remove("hidden");
     positionComposerEmojiPicker();
 }
@@ -165,6 +196,15 @@ function bindEvents() {
             e.target !== openEmojiPickerBtn
         ) {
             closeComposerEmojiPicker();
+        }
+
+        if (
+            composerToolsMenu &&
+            !composerToolsMenu.classList.contains("hidden") &&
+            !composerToolsMenu.contains(e.target) &&
+            e.target !== composerMoreBtn
+        ) {
+            closeComposerToolsMenu();
         }
     });
 
@@ -267,6 +307,13 @@ function bindEvents() {
         });
     }
 
+    if (composerMoreBtn) {
+        composerMoreBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            toggleComposerToolsMenu();
+        });
+    }
+
     quickEmojiBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             appendComposerEmoji(btn.dataset.emoji || "");
@@ -300,22 +347,26 @@ function bindEvents() {
     if (recordVoiceBtn) {
         recordVoiceBtn.addEventListener("click", async () => {
             closeComposerEmojiPicker();
+            closeComposerToolsMenu();
             await toggleVoiceRecording();
         });
     }
 
     attachCameraBtn.addEventListener("click", () => {
         closeComposerEmojiPicker();
+        closeComposerToolsMenu();
         hiddenCameraInput.click();
     });
 
     attachImageBtn.addEventListener("click", () => {
         closeComposerEmojiPicker();
+        closeComposerToolsMenu();
         hiddenImageInput.click();
     });
 
     attachFileBtn.addEventListener("click", () => {
         closeComposerEmojiPicker();
+        closeComposerToolsMenu();
         hiddenFileInput.click();
     });
 
@@ -345,24 +396,32 @@ function bindEvents() {
         this.style.height = "28px";
         this.style.height = Math.min(this.scrollHeight, 110) + "px";
 
+        syncComposerToolsVisibility();
         scrollAllToBottom(true);
         renderConversation(false);
+    });
+
+    messageInput.addEventListener("focus", function () {
+        syncComposerToolsVisibility();
     });
 
     messageInput.addEventListener("keydown", function (e) {
         if (e.key === "Escape") {
             closeComposerEmojiPicker();
+            closeComposerToolsMenu();
         }
 
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             closeComposerEmojiPicker();
+            closeComposerToolsMenu();
             sendMessage();
         }
     });
 
     sendBtn.addEventListener("click", function () {
         closeComposerEmojiPicker();
+        closeComposerToolsMenu();
         sendMessage();
     });
 
@@ -383,4 +442,6 @@ function bindEvents() {
             positionComposerEmojiPicker();
         }
     }, true);
+
+    syncComposerToolsVisibility();
 }

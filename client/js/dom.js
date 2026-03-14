@@ -40,8 +40,12 @@ const encodedMessages = document.getElementById("encodedMessages");
 const chatMessages = document.getElementById("chatMessages");
 const scrollToBottomBtn = document.getElementById("scrollToBottomBtn");
 
+const composerBox = document.getElementById("composerBox");
 const openEmojiPickerBtn = document.getElementById("openEmojiPickerBtn");
 const quickEmojiBtns = document.querySelectorAll(".quick-emoji-btn");
+const composerToolsContainer = document.getElementById("composerToolsContainer");
+const composerMoreBtn = document.getElementById("composerMoreBtn");
+const composerToolsMenu = document.getElementById("composerToolsMenu");
 const recordVoiceBtn = document.getElementById("recordVoiceBtn");
 const attachCameraBtn = document.getElementById("attachCameraBtn");
 const attachImageBtn = document.getElementById("attachImageBtn");

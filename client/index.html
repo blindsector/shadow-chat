@@ -123,7 +123,7 @@
                 <button id="clearReplyBtn" class="reply-close-btn">✕</button>
             </div>
 
-            <div class="composer-box">
+            <div id="composerBox" class="composer-box">
                 <button
                     id="openEmojiPickerBtn"
                     class="quick-tool-btn"
@@ -134,41 +134,51 @@
 
                 <textarea id="messageInput" placeholder="Пиши тук..."></textarea>
 
-                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                <div id="composerToolsContainer" class="composer-tools-container">
                     <button
-                        id="recordVoiceBtn"
-                        class="quick-tool-btn"
+                        id="composerMoreBtn"
+                        class="quick-tool-btn composer-more-btn"
                         type="button"
-                        aria-label="Гласово съобщение"
-                        title="Гласово"
-                    >🎤</button>
+                        aria-label="Още"
+                        title="Още"
+                    >＋</button>
 
-                    <button
-                        id="attachCameraBtn"
-                        class="quick-tool-btn"
-                        type="button"
-                        aria-label="Камера"
-                        title="Камера"
-                    >📷</button>
+                    <div id="composerToolsMenu" class="composer-tools-menu hidden">
+                        <button
+                            id="recordVoiceBtn"
+                            class="quick-tool-btn"
+                            type="button"
+                            aria-label="Гласово съобщение"
+                            title="Гласово"
+                        >🎤</button>
 
-                    <button
-                        id="attachImageBtn"
-                        class="quick-tool-btn"
-                        type="button"
-                        aria-label="Качи снимка"
-                        title="Снимка"
-                    >🖼</button>
+                        <button
+                            id="attachCameraBtn"
+                            class="quick-tool-btn"
+                            type="button"
+                            aria-label="Камера"
+                            title="Камера"
+                        >📷</button>
 
-                    <button
-                        id="attachFileBtn"
-                        class="quick-tool-btn"
-                        type="button"
-                        aria-label="Качи файл"
-                        title="Файл"
-                    >📎</button>
+                        <button
+                            id="attachImageBtn"
+                            class="quick-tool-btn"
+                            type="button"
+                            aria-label="Качи снимка"
+                            title="Снимка"
+                        >🖼</button>
 
-                    <button id="sendBtn" class="send-btn">➤</button>
+                        <button
+                            id="attachFileBtn"
+                            class="quick-tool-btn"
+                            type="button"
+                            aria-label="Качи файл"
+                            title="Файл"
+                        >📎</button>
+                    </div>
                 </div>
+
+                <button id="sendBtn" class="send-btn">➤</button>
             </div>
         </div>
     </section>
