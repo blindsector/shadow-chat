@@ -1471,3 +1471,93 @@ body {
         font-size: 22px;
     }
 }
+
+
+/* SCROLL / CHAT LAYOUT STABILITY FIX */
+#app {
+    min-height: 100dvh;
+}
+
+#chatRoomScreen.screen.active {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+.chat-room-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+}
+
+.chat-panels {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.panel {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 8px 16px 8px;
+}
+
+.message-column {
+    min-height: 100%;
+    justify-content: flex-end;
+    padding-top: 10px;
+    padding-bottom: 4px;
+}
+
+.composer-wrap {
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    flex-shrink: 0;
+}
+
+.scroll-to-bottom {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 900px) {
+    #chatRoomScreen.screen.active {
+        height: 100dvh;
+        min-height: 100dvh;
+    }
+
+    .chat-room-body {
+        height: auto;
+    }
+
+    .chat-panels {
+        grid-template-rows: minmax(160px, 1fr) minmax(160px, 1fr);
+    }
+
+    .panel {
+        padding-bottom: 18px;
+    }
+
+    .scroll-to-bottom {
+        right: 14px;
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+@media (max-width: 640px) {
+    .chat-room-body {
+        height: auto;
+    }
+
+    .scroll-to-bottom {
+        right: 12px;
+        bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+    }
+}
