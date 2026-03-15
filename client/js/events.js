@@ -68,10 +68,6 @@ function syncComposerToolsVisibility() {
 
     const hasText = !!messageInput.value.trim();
     composerBox.classList.toggle("composer-has-text", hasText);
-
-    if (hasText) {
-        closeComposerToolsMenu();
-    }
 }
 
 function positionComposerEmojiPicker() {
@@ -465,8 +461,11 @@ function bindEvents() {
         e.preventDefault();
     });
 
-    sendBtn.addEventListener("touchstart", function (e) {
+    sendBtn.addEventListener("touchend", function (e) {
         e.preventDefault();
+        closeComposerEmojiPicker();
+        closeComposerToolsMenu();
+        sendMessage();
     }, { passive: false });
 
     sendBtn.addEventListener("click", function () {
