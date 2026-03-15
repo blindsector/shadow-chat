@@ -28,12 +28,32 @@ function getAudioFileExtension(mimeType) {
     return ".webm";
 }
 
+function canUseBrowserVoiceCapture() {
+    return !!(
+        window.isSecureContext &&
+        navigator.mediaDevices &&
+        typeof navigator.mediaDevices.getUserMedia === "function" &&
+        typeof MediaRecorder !== "undefined"
+    );
+}
+
 async function startVoiceCapture() {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error("Няма достъп до микрофон.");
+    if (!canUseBrowserVoiceCapture()) {
+        const error = new Error("BROWSER_VOICE_UNSUPPORTED");
+        error.code = "BROWSER_VOICE_UNSUPPORTED";
+        throw error;
     }
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    let stream;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (error) {
+        const wrapped = new Error("MIC_PERMISSION_DENIED");
+        wrapped.code = "MIC_PERMISSION_DENIED";
+        wrapped.cause = error;
+        throw wrapped;
+    }
+
     const mimeType = getSupportedAudioMimeType();
     const options = mimeType ? { mimeType } : undefined;
     const recorder = new MediaRecorder(stream, options);

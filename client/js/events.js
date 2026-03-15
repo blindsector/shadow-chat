@@ -3,6 +3,21 @@ const COMPOSER_EMOJIS = [
     "🙏", "👏", "😎", "🎉", "🤝", "😢"
 ];
 
+const hiddenVoiceInput = document.createElement("input");
+hiddenVoiceInput.type = "file";
+hiddenVoiceInput.accept = "audio/*";
+hiddenVoiceInput.capture = "user";
+hiddenVoiceInput.style.display = "none";
+document.body.appendChild(hiddenVoiceInput);
+
+function isAndroidDevice() {
+    return /Android/i.test(navigator.userAgent || "");
+}
+
+function shouldUseNativeVoiceCapture() {
+    return isAndroidDevice();
+}
+
 function insertTextAtCursor(input, text) {
     const start = input.selectionStart || 0;
     const end = input.selectionEnd || 0;
@@ -136,8 +151,17 @@ function setVoiceButtonRecordingState(isRecording) {
     recordVoiceBtn.setAttribute("aria-label", isRecording ? "Спри запис" : "Гласово съобщение");
 }
 
+function openNativeVoicePicker() {
+    hiddenVoiceInput.click();
+}
+
 async function toggleVoiceRecording() {
     if (!recordVoiceBtn) return;
+
+    if (shouldUseNativeVoiceCapture()) {
+        openNativeVoicePicker();
+        return;
+    }
 
     if (state.voiceRecordingSession && state.voiceRecordingSession.recorder) {
         const session = state.voiceRecordingSession;
@@ -162,6 +186,12 @@ async function toggleVoiceRecording() {
         setVoiceButtonRecordingState(true);
     } catch (error) {
         console.error(error);
+
+        if (error && error.code === "BROWSER_VOICE_UNSUPPORTED" && isAndroidDevice()) {
+            openNativeVoicePicker();
+            return;
+        }
+
         alert("Няма достъп до микрофон.");
     }
 }
@@ -340,6 +370,13 @@ function bindEvents() {
     hiddenFileInput.addEventListener("change", function () {
         if (this.files && this.files[0]) {
             uploadAttachment(this.files[0]);
+        }
+        this.value = "";
+    });
+
+    hiddenVoiceInput.addEventListener("change", function () {
+        if (this.files && this.files[0]) {
+            queueVoiceAttachment(this.files[0]);
         }
         this.value = "";
     });
