@@ -989,38 +989,37 @@ body {
     align-items: center;
     justify-content: center;
 
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+
     transition:
         transform 0.08s ease,
-        box-shadow 0.12s ease,
         filter 0.12s ease,
-        background 0.15s ease;
-}
-
-/* Telegram-style glow when active */
-.send-btn:not(:disabled) {
-    box-shadow: 0 0 0 0 rgba(43,108,255,0.5);
+        background 0.15s ease,
+        opacity 0.12s ease;
 }
 
 .send-btn:not(:disabled):hover {
     filter: brightness(1.12);
-    box-shadow: 0 0 10px rgba(43,108,255,0.45);
 }
 
 .send-btn:not(:disabled):active {
-    transform: scale(0.9);
-    box-shadow: 0 0 14px rgba(43,108,255,0.65);
+    transform: scale(0.92);
+    filter: brightness(1.18);
 }
 
-/* disabled state */
-.send-btn:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+.send-btn:focus,
+.send-btn:focus-visible {
+    outline: none;
     box-shadow: none;
 }
 
 .send-btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    box-shadow: none;
+    filter: none;
+    transform: none;
 }
 
 .modal {
@@ -1574,5 +1573,18 @@ body {
 @media (max-width: 640px) {
     .scroll-btn-count {
         display: none !important;
+    }
+}
+
+
+@media (max-width: 900px) {
+    .send-btn:not(:disabled):hover {
+        filter: none;
+    }
+
+    .send-btn:not(:disabled):active {
+        transform: scale(0.94);
+        filter: brightness(1.14);
+        box-shadow: none;
     }
 }
