@@ -1000,12 +1000,12 @@ body {
 }
 
 .send-btn:not(:disabled):hover {
-    filter: brightness(1.18);
+    filter: brightness(1.12);
 }
 
 .send-btn:not(:disabled):active {
-    transform: scale(0.86);
-    filter: brightness(1.25);
+    transform: scale(0.92);
+    filter: brightness(1.18);
 }
 
 .send-btn:focus,
@@ -1586,5 +1586,55 @@ body {
         transform: scale(0.94);
         filter: brightness(1.14);
         box-shadow: none;
+    }
+}
+
+
+.encoded-overlay {
+    overflow: hidden;
+}
+
+.encoded-overlay-messages {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 118px;
+    overflow: hidden;
+}
+
+.encoded-overlay-item {
+    display: block;
+    width: 100%;
+    padding: 7px 9px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #e5e7eb;
+    font-size: 12px;
+    line-height: 1.28;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow: hidden;
+}
+
+.encoded-overlay-item.is-preview {
+    background: rgba(43, 108, 255, 0.16);
+    color: #ffffff;
+}
+
+.encoded-overlay-item.is-empty {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+}
+
+@media (max-width: 640px) {
+    .encoded-overlay {
+        top: 10px;
+        left: 10px;
+        width: 210px;
+        max-height: 158px;
+    }
+
+    .encoded-overlay-messages {
+        max-height: 112px;
     }
 }

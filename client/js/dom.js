@@ -96,6 +96,8 @@ const menuForwardBtn = document.getElementById("menuForwardBtn");
 const menuDeleteBtn = document.getElementById("menuDeleteBtn");
 
 const emojiPicker = document.getElementById("emojiPicker");
+const encodedOverlay = document.getElementById("encodedOverlay");
+const encodedOverlayMessages = document.getElementById("encodedOverlayMessages");
 
 const hiddenCameraInput = document.createElement("input");
 hiddenCameraInput.type = "file";
