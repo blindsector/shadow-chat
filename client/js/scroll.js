@@ -87,34 +87,7 @@ function getArrowHtml() {
 }
 
 function getCountHtml(count, fading = false) {
-    return `
-        <span
-            class="scroll-btn-count"
-            style="
-                position:absolute;
-                top:-5px;
-                right:-5px;
-                min-width:20px;
-                height:20px;
-                padding:0 6px;
-                border-radius:999px;
-                background:rgba(255,255,255,0.96);
-                color:#1e3a8a;
-                font-size:11px;
-                font-weight:800;
-                display:inline-flex;
-                align-items:center;
-                justify-content:center;
-                line-height:1;
-                box-shadow:0 8px 18px rgba(0,0,0,0.14);
-                border:1px solid rgba(255,255,255,0.65);
-                opacity:${fading ? "0" : "1"};
-                transform:${fading ? "scale(0.82)" : "scale(1)"};
-                transition:opacity ${BADGE_FADE_MS}ms ease, transform ${BADGE_FADE_MS}ms ease;
-                pointer-events:none;
-            "
-        >${count}</span>
-    `;
+    return "";
 }
 
 function renderScrollButton(showBadge = false, fading = false) {
@@ -126,62 +99,29 @@ function renderScrollButton(showBadge = false, fading = false) {
     }
 
     scrollToBottomBtn.classList.remove("hidden");
-    scrollToBottomBtn.style.position = "fixed";
-    scrollToBottomBtn.style.overflow = "visible";
-    scrollToBottomBtn.style.pointerEvents = "auto";
-    scrollToBottomBtn.style.width = "46px";
-    scrollToBottomBtn.style.height = "46px";
-    scrollToBottomBtn.style.minWidth = "46px";
-    scrollToBottomBtn.style.padding = "0";
-    scrollToBottomBtn.style.border = "0";
-    scrollToBottomBtn.style.borderRadius = "999px";
-    scrollToBottomBtn.style.background = "linear-gradient(180deg, rgba(59,130,246,0.92), rgba(37,99,235,0.92))";
-    scrollToBottomBtn.style.boxShadow = "0 10px 24px rgba(0,0,0,0.18)";
-    scrollToBottomBtn.style.backdropFilter = "blur(10px)";
-    scrollToBottomBtn.style.webkitBackdropFilter = "blur(10px)";
-    scrollToBottomBtn.style.display = "inline-flex";
-    scrollToBottomBtn.style.alignItems = "center";
-    scrollToBottomBtn.style.justifyContent = "center";
+    scrollToBottomBtn.style.position = "";
+    scrollToBottomBtn.style.overflow = "";
+    scrollToBottomBtn.style.pointerEvents = "";
+    scrollToBottomBtn.style.width = "";
+    scrollToBottomBtn.style.height = "";
+    scrollToBottomBtn.style.minWidth = "";
+    scrollToBottomBtn.style.padding = "";
+    scrollToBottomBtn.style.border = "";
+    scrollToBottomBtn.style.borderRadius = "";
+    scrollToBottomBtn.style.background = "";
+    scrollToBottomBtn.style.boxShadow = "";
+    scrollToBottomBtn.style.backdropFilter = "";
+    scrollToBottomBtn.style.webkitBackdropFilter = "";
+    scrollToBottomBtn.style.display = "";
+    scrollToBottomBtn.style.alignItems = "";
+    scrollToBottomBtn.style.justifyContent = "";
 
-    const badgeHtml = showBadge && unseenMessagesCount > 0
-        ? getCountHtml(unseenMessagesCount, fading)
-        : "";
-
-    scrollToBottomBtn.innerHTML = `
-        <span style="
-            position:relative;
-            width:100%;
-            height:100%;
-            display:inline-flex;
-            align-items:center;
-            justify-content:center;
-            pointer-events:none;
-        ">
-            ${getArrowHtml()}
-            ${badgeHtml}
-        </span>
-    `;
-
-    lastBadgeVisible = showBadge && unseenMessagesCount > 0;
+    scrollToBottomBtn.innerHTML = getArrowHtml();
+    lastBadgeVisible = false;
 }
 
 function showBadgeBriefly() {
-    clearBadgeTimers();
-
-    if (!userReadingOldMessages || unseenMessagesCount <= 0) {
-        renderScrollButton(false, false);
-        return;
-    }
-
-    renderScrollButton(true, false);
-
-    badgeHideTimer = setTimeout(() => {
-        renderScrollButton(true, true);
-
-        badgeFadeTimer = setTimeout(() => {
-            renderScrollButton(false, false);
-        }, BADGE_FADE_MS);
-    }, BADGE_VISIBLE_MS);
+    renderScrollButton(false, false);
 }
 
 function updateScrollButton() {
@@ -382,27 +322,8 @@ function bindComposerAutoScroll() {
         scrollAllToBottom(true, true);
     });
 
-    messageInput.addEventListener("input", () => {
+    messageInput.addEventListener("pointerdown", () => {
         scrollAllToBottom(true, true);
-    });
-
-    messageInput.addEventListener("keydown", (event) => {
-        const ignoredKeys = [
-            "Shift",
-            "Control",
-            "Alt",
-            "Meta",
-            "ArrowLeft",
-            "ArrowRight",
-            "ArrowUp",
-            "ArrowDown",
-            "Escape",
-            "Tab"
-        ];
-
-        if (!ignoredKeys.includes(event.key)) {
-            scrollAllToBottom(true, true);
-        }
     });
 
     sendBtn.addEventListener("mousedown", () => {
