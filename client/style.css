@@ -981,11 +981,45 @@ body {
     border-radius: 50%;
     font-size: 18px;
     padding: 0;
+
+    background: var(--blue);
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+
+    transition:
+        transform 0.08s ease,
+        filter 0.12s ease,
+        background 0.15s ease,
+        opacity 0.12s ease;
+}
+
+.send-btn:not(:disabled):hover {
+    filter: brightness(1.12);
+}
+
+.send-btn:not(:disabled):active {
+    transform: scale(0.92);
+    filter: brightness(1.18);
+}
+
+.send-btn:focus,
+.send-btn:focus-visible {
+    outline: none;
+    box-shadow: none;
 }
 
 .send-btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
+    box-shadow: none;
+    filter: none;
+    transform: none;
 }
 
 .modal {
@@ -1539,5 +1573,18 @@ body {
 @media (max-width: 640px) {
     .scroll-btn-count {
         display: none !important;
+    }
+}
+
+
+@media (max-width: 900px) {
+    .send-btn:not(:disabled):hover {
+        filter: none;
+    }
+
+    .send-btn:not(:disabled):active {
+        transform: scale(0.94);
+        filter: brightness(1.14);
+        box-shadow: none;
     }
 }
