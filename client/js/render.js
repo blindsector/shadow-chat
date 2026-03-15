@@ -183,7 +183,7 @@ function createReceiptMeta(item, isMe, isLastOwnMessage) {
 
     if (item.seen_at) {
         meta.style.opacity = "1";
-        meta.style.color = "#7dd3fc";
+        meta.style.color = "#8b5cf6";
     } else if (item.delivered_at) {
         meta.style.opacity = "0.7";
         meta.style.color = "";
@@ -727,7 +727,6 @@ function renderConversation(forceScroll) {
     });
 
     renderLivePreview();
-    renderEncodedOverlay(units);
 
     state.lastConversationRenderSignature = nextConversationSignature;
     state.lastLivePreviewSignature = nextPreviewSignature;
@@ -741,100 +740,4 @@ function renderConversation(forceScroll) {
             afterConversationRender();
         }
     });
-}
-
-
-function getOverlayAttachmentLabel(item) {
-    if (!item) return "";
-    if (item.type === "image") return "[image]";
-    if (item.type === "file") return "[file]";
-    return "";
-}
-
-function getEncodedOverlayUnitText(unit) {
-    if (!unit || !unit.actionItem) return "";
-
-    const item = unit.actionItem;
-    const parts = [];
-
-    const attachmentLabel = getOverlayAttachmentLabel(item);
-    if (attachmentLabel) {
-        parts.push(attachmentLabel);
-    }
-
-    const encodedText = unit.textItem
-        ? getEncodedVisibleText(unit.textItem)
-        : getEncodedVisibleText(item);
-
-    if (encodedText) {
-        parts.push(encodedText);
-    }
-
-    return parts.join("\n").trim();
-}
-
-function appendEncodedOverlayItem(text, className) {
-    if (!encodedOverlayMessages || !text) return;
-
-    const item = document.createElement("div");
-    item.className = "encoded-overlay-item" + (className ? " " + className : "");
-    item.textContent = text;
-    encodedOverlayMessages.appendChild(item);
-}
-
-function renderEncodedOverlay(units) {
-    if (!encodedOverlay || !encodedOverlayMessages) return;
-
-    const isChatVisible =
-        !!chatRoomScreen &&
-        chatRoomScreen.classList.contains("active") &&
-        !!state.activeChatId;
-
-    if (!isChatVisible) {
-        encodedOverlay.classList.add("hidden");
-        encodedOverlayMessages.innerHTML = "";
-        return;
-    }
-
-    encodedOverlayMessages.innerHTML = "";
-
-    const rawPreview = messageInput && typeof messageInput.value === "string"
-        ? messageInput.value.trim()
-        : "";
-
-    const hasPendingAttachment =
-        typeof hasPendingAttachmentUpload === "function" &&
-        hasPendingAttachmentUpload();
-
-    if (rawPreview || hasPendingAttachment) {
-        const previewParts = [];
-
-        if (hasPendingAttachment) {
-            const pendingItem = createPendingAttachmentPreviewItem();
-            previewParts.push(getOverlayAttachmentLabel(pendingItem));
-        }
-
-        if (rawPreview) {
-            previewParts.push(encodeText(buildOutgoingText(rawPreview)));
-        }
-
-        appendEncodedOverlayItem(
-            previewParts.filter(Boolean).join("\n").trim(),
-            "is-preview"
-        );
-    }
-
-    const recentUnits = Array.isArray(units) ? units.slice(-2) : [];
-    recentUnits.forEach(function (unit) {
-        const text = getEncodedOverlayUnitText(unit);
-        if (text) {
-            appendEncodedOverlayItem(text, "");
-        }
-    });
-
-    if (!encodedOverlayMessages.children.length) {
-        appendEncodedOverlayItem("No encoded messages yet.", "is-empty");
-    }
-
-    encodedOverlay.classList.remove("hidden");
 }
