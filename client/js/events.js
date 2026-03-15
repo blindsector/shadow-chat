@@ -434,8 +434,13 @@ function bindEvents() {
         this.style.height = Math.min(this.scrollHeight, 110) + "px";
 
         syncComposerToolsVisibility();
-        scrollAllToBottom(true);
         renderConversation(false);
+
+        if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
+            scrollAllToBottom(true, false);
+        } else if (typeof updateScrollButton === "function") {
+            updateScrollButton();
+        }
     });
 
     messageInput.addEventListener("focus", function () {

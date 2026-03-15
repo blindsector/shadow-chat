@@ -1473,91 +1473,79 @@ body {
 }
 
 
-/* SCROLL / CHAT LAYOUT STABILITY FIX */
-#app {
-    min-height: 100dvh;
-}
-
-#chatRoomScreen.screen.active {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    min-height: 100dvh;
-    overflow: hidden;
-}
-
+/* SCROLL / COMPOSER TUNING FIX */
 .chat-room-body {
-    flex: 1 1 auto;
     min-height: 0;
-    height: auto;
     overflow: hidden;
 }
 
 .chat-panels {
-    flex: 1 1 auto;
     min-height: 0;
-    height: 100%;
     overflow: hidden;
 }
 
 .panel {
-    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    padding: 8px 8px 16px 8px;
+    padding-bottom: 128px;
 }
 
 .message-column {
     min-height: 100%;
     justify-content: flex-end;
-    padding-top: 10px;
-    padding-bottom: 4px;
 }
 
 .composer-wrap {
     position: sticky;
     bottom: 0;
-    z-index: 40;
-    flex-shrink: 0;
+    z-index: 45;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+.composer-box {
+    align-items: flex-end;
+}
+
+.composer-box textarea {
+    overflow-y: auto;
+    line-height: 1.35;
+}
+
+.preview-shell,
+.preview-bubble {
+    margin-bottom: 4px;
 }
 
 .scroll-to-bottom {
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+    bottom: calc(124px + env(safe-area-inset-bottom, 0px));
+    z-index: 60;
 }
 
 @media (max-width: 900px) {
-    #chatRoomScreen.screen.active {
-        height: 100dvh;
-        min-height: 100dvh;
-    }
-
-    .chat-room-body {
-        height: auto;
-    }
-
-    .chat-panels {
-        grid-template-rows: minmax(160px, 1fr) minmax(160px, 1fr);
-    }
-
     .panel {
-        padding-bottom: 18px;
+        padding-bottom: 136px;
+    }
+
+    .composer-wrap {
+        padding: 8px 10px calc(10px + env(safe-area-inset-bottom, 0px));
     }
 
     .scroll-to-bottom {
         right: 14px;
-        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(118px + env(safe-area-inset-bottom, 0px));
     }
 }
 
 @media (max-width: 640px) {
-    .chat-room-body {
-        height: auto;
+    .panel {
+        padding-bottom: 142px;
     }
 
     .scroll-to-bottom {
         right: 12px;
-        bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(114px + env(safe-area-inset-bottom, 0px));
     }
 }
