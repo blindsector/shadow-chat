@@ -477,7 +477,7 @@ body {
 .panel {
     min-height: 0;
     overflow-y: auto;
-    padding: 6px 8px 12px 8px;
+    padding: 6px 8px 88px 8px;
     background: rgba(0, 0, 0, 0.08);
 }
 
@@ -489,6 +489,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    min-height: 100%;
+    justify-content: flex-end;
 }
 
 .message-stack {
@@ -785,10 +787,12 @@ body {
 }
 
 .chat-image {
-    max-width: 220px;
+    max-width: 210px;
+    max-height: 168px;
     border-radius: 10px;
     display: block;
     cursor: zoom-in;
+    object-fit: cover;
 }
 
 .chat-image-name,
@@ -887,7 +891,7 @@ body {
     bottom: 0;
     background: #111111;
     border-top: 1px solid var(--line);
-    padding: 10px;
+    padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px));
 }
 
 .reply-bar {
@@ -1512,7 +1516,7 @@ body {
 
 @media (max-width: 900px) {
     .panel {
-        padding-bottom: 102px;
+        padding-bottom: 94px;
     }
 
     .scroll-to-bottom {
@@ -1534,8 +1538,13 @@ body {
         max-height: 132px;
     }
 
+    .chat-image {
+        max-width: 176px;
+        max-height: 138px;
+    }
+
     .panel {
-        padding-bottom: 98px;
+        padding-bottom: 90px;
     }
 
     .scroll-to-bottom {
