@@ -183,7 +183,7 @@ function createReceiptMeta(item, isMe, isLastOwnMessage) {
 
     if (item.seen_at) {
         meta.style.opacity = "1";
-        meta.style.color = "#8b5cf6";
+        meta.style.color = "#60a5fa";
     } else if (item.delivered_at) {
         meta.style.opacity = "0.7";
         meta.style.color = "";
