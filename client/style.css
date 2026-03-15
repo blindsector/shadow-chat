@@ -1000,12 +1000,12 @@ body {
 }
 
 .send-btn:not(:disabled):hover {
-    filter: brightness(1.12);
+    filter: brightness(1.18);
 }
 
 .send-btn:not(:disabled):active {
-    transform: scale(0.92);
-    filter: brightness(1.18);
+    transform: scale(0.86);
+    filter: brightness(1.25);
 }
 
 .send-btn:focus,
