@@ -6,6 +6,7 @@ let lastDecodedScrollHeight = 0;
 let lastEncodedScrollHeight = 0;
 
 const NEAR_BOTTOM_THRESHOLD = 60;
+const SCROLL_BUTTON_SCREEN_THRESHOLD = 1.0;
 const SMOOTH_SCROLL_MIN_MS = 420;
 const SMOOTH_SCROLL_MAX_MS = 920;
 const BADGE_VISIBLE_MS = 1350;
@@ -33,6 +34,18 @@ function isNearBottom(container, threshold = NEAR_BOTTOM_THRESHOLD) {
 
 function shouldAutoFollow() {
     return isNearBottom(decodedPanel) && isNearBottom(encodedPanel);
+}
+
+function shouldShowScrollButton() {
+    const decodedDistance = getDistanceFromBottom(decodedPanel);
+    const encodedDistance = getDistanceFromBottom(encodedPanel);
+    const maxDistance = Math.max(decodedDistance, encodedDistance);
+
+    const decodedThreshold = decodedPanel.clientHeight * SCROLL_BUTTON_SCREEN_THRESHOLD;
+    const encodedThreshold = encodedPanel.clientHeight * SCROLL_BUTTON_SCREEN_THRESHOLD;
+    const threshold = Math.max(decodedThreshold, encodedThreshold);
+
+    return maxDistance > threshold;
 }
 
 function shouldIgnoreScrollEvent() {
@@ -105,7 +118,7 @@ function getCountHtml(count, fading = false) {
 }
 
 function renderScrollButton(showBadge = false, fading = false) {
-    if (!userReadingOldMessages) {
+    if (!userReadingOldMessages || !shouldShowScrollButton()) {
         scrollToBottomBtn.classList.add("hidden");
         scrollToBottomBtn.innerHTML = "";
         lastBadgeVisible = false;
