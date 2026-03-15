@@ -461,6 +461,14 @@ function bindEvents() {
         }
     });
 
+    sendBtn.addEventListener("mousedown", function (e) {
+        e.preventDefault();
+    });
+
+    sendBtn.addEventListener("touchstart", function (e) {
+        e.preventDefault();
+    }, { passive: false });
+
     sendBtn.addEventListener("click", function () {
         closeComposerEmojiPicker();
         closeComposerToolsMenu();
