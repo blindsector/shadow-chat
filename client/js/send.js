@@ -58,6 +58,11 @@ async function sendMessage() {
         await loadConversation(true);
         await loadAllChatSources();
 
+        // keep keyboard active
+        if (messageInput) {
+            messageInput.focus();
+        }
+
     } catch (error) {
         alert(error.message);
     }
