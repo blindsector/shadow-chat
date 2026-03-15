@@ -1473,79 +1473,72 @@ body {
 }
 
 
-/* SCROLL / COMPOSER TUNING FIX */
-.chat-room-body {
-    min-height: 0;
-    overflow: hidden;
+/* PREVIEW SIZE / MESSAGE POSITION TUNING */
+.preview-shell,
+.preview-bubble {
+    max-width: min(220px, 58vw);
+    width: fit-content;
+    margin-bottom: 6px;
 }
 
-.chat-panels {
-    min-height: 0;
-    overflow: hidden;
+.preview-shell img,
+.preview-bubble img,
+.preview-shell video,
+.preview-bubble video {
+    max-width: min(200px, 54vw);
+    max-height: 160px;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    border-radius: 14px;
 }
 
 .panel {
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 128px;
+    padding-bottom: 96px;
 }
 
 .message-column {
-    min-height: 100%;
-    justify-content: flex-end;
+    padding-bottom: 0;
 }
 
 .composer-wrap {
-    position: sticky;
-    bottom: 0;
-    z-index: 45;
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0px));
-}
-
-.composer-box {
-    align-items: flex-end;
-}
-
-.composer-box textarea {
-    overflow-y: auto;
-    line-height: 1.35;
-}
-
-.preview-shell,
-.preview-bubble {
-    margin-bottom: 4px;
+    padding-top: 6px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
 }
 
 .scroll-to-bottom {
-    right: 16px;
-    bottom: calc(124px + env(safe-area-inset-bottom, 0px));
-    z-index: 60;
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px));
 }
 
 @media (max-width: 900px) {
     .panel {
-        padding-bottom: 136px;
-    }
-
-    .composer-wrap {
-        padding: 8px 10px calc(10px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: 102px;
     }
 
     .scroll-to-bottom {
-        right: 14px;
-        bottom: calc(118px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(94px + env(safe-area-inset-bottom, 0px));
     }
 }
 
 @media (max-width: 640px) {
+    .preview-shell,
+    .preview-bubble {
+        max-width: min(180px, 56vw);
+    }
+
+    .preview-shell img,
+    .preview-bubble img,
+    .preview-shell video,
+    .preview-bubble video {
+        max-width: min(168px, 52vw);
+        max-height: 132px;
+    }
+
     .panel {
-        padding-bottom: 142px;
+        padding-bottom: 98px;
     }
 
     .scroll-to-bottom {
-        right: 12px;
-        bottom: calc(114px + env(safe-area-inset-bottom, 0px));
+        bottom: calc(92px + env(safe-area-inset-bottom, 0px));
     }
 }
