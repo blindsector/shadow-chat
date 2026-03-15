@@ -1479,7 +1479,7 @@ body {
 
 /* BOTTOM STACK / SCROLL BUTTON TUNING */
 .panel {
-    padding: 6px 8px 58px 8px;
+    padding: 6px 8px 44px 8px;
 }
 
 .message-column {
@@ -1500,7 +1500,7 @@ body {
 
 @media (max-width: 900px) {
     .panel {
-        padding-bottom: 60px;
+        padding-bottom: 46px;
     }
 
     .scroll-to-bottom {
@@ -1516,7 +1516,7 @@ body {
 
 @media (max-width: 640px) {
     .panel {
-        padding-bottom: 62px;
+        padding-bottom: 48px;
     }
 
     .chat-image {
@@ -1532,5 +1532,12 @@ body {
 
     .scroll-to-bottom:hover {
         transform: translate(-50%, -50%);
+    }
+}
+
+
+@media (max-width: 640px) {
+    .scroll-btn-count {
+        display: none !important;
     }
 }
