@@ -1457,7 +1457,7 @@ body {
 }
 
 .composer-has-text .composer-tools-container {
-    display: none;
+    display: flex;
 }
 
 .composer-has-text textarea {
