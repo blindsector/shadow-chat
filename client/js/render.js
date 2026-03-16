@@ -754,11 +754,10 @@ function getOverlayElements() {
 }
 
 function renderEncodedOverlay() {
-    const refs = getOverlayElements();
-    const overlay = refs.overlay;
-    const messages = refs.messages;
+    const overlay = document.getElementById("encodedOverlay");
+    const viewport = document.getElementById("encodedOverlayMessages");
 
-    if (!overlay || !messages) return;
+    if (!overlay || !viewport) return;
 
     const isChatVisible =
         !!chatRoomScreen &&
@@ -767,17 +766,16 @@ function renderEncodedOverlay() {
 
     if (!isChatVisible) {
         overlay.classList.add("hidden");
-        messages.innerHTML = "";
         return;
     }
 
-    messages.innerHTML = "";
-
-    Array.from(encodedMessages.children).forEach(function (node) {
-        messages.appendChild(node.cloneNode(true));
-    });
+    // местим истинския encodedMessages контейнер
+    if (!viewport.contains(encodedMessages)) {
+        viewport.appendChild(encodedMessages);
+    }
 
     overlay.classList.remove("hidden");
-    messages.scrollTop = messages.scrollHeight;
+
+    encodedMessages.scrollTop = encodedMessages.scrollHeight;
 }
 
