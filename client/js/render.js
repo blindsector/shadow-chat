@@ -629,20 +629,34 @@ function createPendingAttachmentPreviewItem() {
     };
 }
 
+function keepEncodedPreviewPinnedToBottom() {
+    if (!encodedMessages) return;
+
+    requestAnimationFrame(function () {
+        encodedMessages.scrollTop = encodedMessages.scrollHeight;
+    });
+}
+
 function renderLivePreview() {
     const raw = messageInput.value.trim();
     const hasPendingAttachment =
         typeof hasPendingAttachmentUpload === "function" &&
         hasPendingAttachmentUpload();
 
-    if (!raw && !hasPendingAttachment) return;
+    if (!raw && !hasPendingAttachment) {
+        keepEncodedPreviewPinnedToBottom();
+        return;
+    }
 
     const encodedStack = document.createElement("div");
-    encodedStack.className = "message-stack";
-    encodedStack.style.alignItems = "flex-start";
+    encodedStack.className = "message-stack stack-me";
+    encodedStack.dataset.preview = "1";
+    encodedStack.style.alignItems = "flex-end";
 
     const encodedPreview = document.createElement("div");
-    encodedPreview.className = "encoded-bubble encoded-me preview-bubble";
+    encodedPreview.className = "encoded-bubble encoded-her preview-bubble";
+    encodedPreview.dataset.preview = "1";
+    encodedPreview.style.alignSelf = "flex-end";
 
     if (hasPendingAttachment) {
         const pendingItem = createPendingAttachmentPreviewItem();
@@ -666,35 +680,37 @@ function renderLivePreview() {
     encodedStack.appendChild(encShell);
     encodedMessages.appendChild(encodedStack);
 
-    if (!hasPendingAttachment) {
-        return;
+    if (hasPendingAttachment) {
+        const decodedStack = document.createElement("div");
+        decodedStack.className = "message-stack stack-me";
+        decodedStack.dataset.preview = "1";
+
+        const decodedPreview = document.createElement("div");
+        decodedPreview.className = "bubble me preview-bubble";
+        decodedPreview.dataset.preview = "1";
+
+        const pendingItem = createPendingAttachmentPreviewItem();
+        if (pendingItem) {
+            decodedPreview.appendChild(makeFileCard(pendingItem));
+        }
+
+        if (raw) {
+            const msg = document.createElement("div");
+            msg.className = "message-text";
+            msg.textContent = raw;
+            msg.style.marginTop = "10px";
+            decodedPreview.appendChild(msg);
+        }
+
+        const decShell = document.createElement("div");
+        decShell.className = "bubble-shell decoded-shell preview-shell";
+        decShell.appendChild(decodedPreview);
+
+        decodedStack.appendChild(decShell);
+        chatMessages.appendChild(decodedStack);
     }
 
-    const decodedStack = document.createElement("div");
-    decodedStack.className = "message-stack stack-me";
-
-    const decodedPreview = document.createElement("div");
-    decodedPreview.className = "bubble me preview-bubble";
-
-    const pendingItem = createPendingAttachmentPreviewItem();
-    if (pendingItem) {
-        decodedPreview.appendChild(makeFileCard(pendingItem));
-    }
-
-    if (raw) {
-        const msg = document.createElement("div");
-        msg.className = "message-text";
-        msg.textContent = raw;
-        msg.style.marginTop = "10px";
-        decodedPreview.appendChild(msg);
-    }
-
-    const decShell = document.createElement("div");
-    decShell.className = "bubble-shell decoded-shell preview-shell";
-    decShell.appendChild(decodedPreview);
-
-    decodedStack.appendChild(decShell);
-    chatMessages.appendChild(decodedStack);
+    keepEncodedPreviewPinnedToBottom();
 }
 
 function renderConversation(forceScroll) {
@@ -753,11 +769,33 @@ function getOverlayElements() {
     };
 }
 
+function applyEncodedOverlayViewportLayout(viewport) {
+    if (!viewport || !encodedMessages) return;
+
+    viewport.style.display = "flex";
+    viewport.style.flexDirection = "column";
+    viewport.style.justifyContent = "flex-end";
+    viewport.style.overflow = "hidden";
+    viewport.style.minHeight = "0";
+
+    encodedMessages.style.display = "flex";
+    encodedMessages.style.flexDirection = "column";
+    encodedMessages.style.justifyContent = "flex-end";
+    encodedMessages.style.gap = "8px";
+    encodedMessages.style.height = "100%";
+    encodedMessages.style.minHeight = "100%";
+    encodedMessages.style.maxHeight = "100%";
+    encodedMessages.style.overflowY = "auto";
+    encodedMessages.style.overflowX = "hidden";
+    encodedMessages.style.webkitOverflowScrolling = "touch";
+    encodedMessages.style.paddingBottom = "2px";
+}
+
 function renderEncodedOverlay() {
     const overlay = document.getElementById("encodedOverlay");
     const viewport = document.getElementById("encodedOverlayMessages");
 
-    if (!overlay || !viewport) return;
+    if (!overlay || !viewport || !encodedMessages) return;
 
     const isChatVisible =
         !!chatRoomScreen &&
@@ -769,13 +807,14 @@ function renderEncodedOverlay() {
         return;
     }
 
-    // местим истинския encodedMessages контейнер
     if (!viewport.contains(encodedMessages)) {
         viewport.appendChild(encodedMessages);
     }
 
+    applyEncodedOverlayViewportLayout(viewport);
+
     overlay.classList.remove("hidden");
 
-    encodedMessages.scrollTop = encodedMessages.scrollHeight;
+    keepEncodedPreviewPinnedToBottom();
 }
 
