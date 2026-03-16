@@ -256,7 +256,6 @@ function startEncodedOverlayDrag(e) {
 function handleEncodedOverlayDragMove(e) {
     const overlay = getEncodedOverlayElement();
     if (!overlay || !overlayDragState) return;
-    if (e.pointerId !== overlayDragState.pointerId) return;
 
     const nextLeft = e.clientX - overlayDragState.offsetX;
     const nextTop = e.clientY - overlayDragState.offsetY;
