@@ -7,6 +7,18 @@ const NEAR_BOTTOM_THRESHOLD = 60;
 let panelSyncLock = false;
 
 function getEncodedScrollContainer() {
+    if (
+        typeof encodedOverlay !== "undefined" &&
+        encodedOverlay &&
+        !encodedOverlay.classList.contains("hidden") &&
+        typeof encodedOverlayMessages !== "undefined" &&
+        encodedOverlayMessages &&
+        typeof encodedMessages !== "undefined" &&
+        encodedMessages &&
+        encodedOverlayMessages.contains(encodedMessages)
+    ) {
+        return encodedMessages;
+    }
 
     if (typeof encodedPanel !== "undefined" && encodedPanel) {
         return encodedPanel;
@@ -28,18 +40,17 @@ function isNearBottom(container) {
 }
 
 function shouldAutoFollow() {
-
     const encoded = getEncodedScrollContainer();
 
-    if (!encoded) return true;
+    if (!decodedPanel) return true;
+    if (!encoded) return isNearBottom(decodedPanel);
 
     return isNearBottom(decodedPanel) && isNearBottom(encoded);
 }
 
 function syncFromDecoded() {
-
     const encoded = getEncodedScrollContainer();
-    if (!encoded) return;
+    if (!decodedPanel || !encoded) return;
 
     const decodedMax = decodedPanel.scrollHeight - decodedPanel.clientHeight;
     const encodedMax = encoded.scrollHeight - encoded.clientHeight;
@@ -49,16 +60,13 @@ function syncFromDecoded() {
     const ratio = decodedPanel.scrollTop / decodedMax;
 
     panelSyncLock = true;
-
     encoded.scrollTop = encodedMax * ratio;
-
     panelSyncLock = false;
 }
 
 function syncFromEncoded() {
-
     const encoded = getEncodedScrollContainer();
-    if (!encoded) return;
+    if (!decodedPanel || !encoded) return;
 
     const decodedMax = decodedPanel.scrollHeight - decodedPanel.clientHeight;
     const encodedMax = encoded.scrollHeight - encoded.clientHeight;
@@ -68,23 +76,23 @@ function syncFromEncoded() {
     const ratio = encoded.scrollTop / encodedMax;
 
     panelSyncLock = true;
-
     decodedPanel.scrollTop = decodedMax * ratio;
-
     panelSyncLock = false;
 }
 
 function scrollAllToBottom(force = false) {
-
     const encoded = getEncodedScrollContainer();
-    if (!encoded) return;
+    if (!decodedPanel) return;
 
     if (!force && userReadingOldMessages) return;
 
     panelSyncLock = true;
 
     decodedPanel.scrollTop = decodedPanel.scrollHeight;
-    encoded.scrollTop = encoded.scrollHeight;
+
+    if (encoded) {
+        encoded.scrollTop = encoded.scrollHeight;
+    }
 
     panelSyncLock = false;
 
@@ -95,7 +103,6 @@ function scrollAllToBottom(force = false) {
 }
 
 function updateScrollButton() {
-
     if (!scrollToBottomBtn) return;
 
     if (!userReadingOldMessages) {
@@ -104,16 +111,10 @@ function updateScrollButton() {
     }
 
     scrollToBottomBtn.classList.remove("hidden");
-
-    if (unseenMessagesCount > 0) {
-        scrollToBottomBtn.textContent = "↓ " + unseenMessagesCount;
-    } else {
-        scrollToBottomBtn.textContent = "↓";
-    }
+    scrollToBottomBtn.textContent = unseenMessagesCount > 0 ? "↓ " + unseenMessagesCount : "↓";
 }
 
 function handleDecodedScroll() {
-
     if (panelSyncLock) return;
 
     syncFromDecoded();
@@ -129,7 +130,6 @@ function handleDecodedScroll() {
 }
 
 function handleEncodedScroll() {
-
     if (panelSyncLock) return;
 
     syncFromEncoded();
@@ -145,32 +145,42 @@ function handleEncodedScroll() {
 }
 
 function afterConversationRender() {
-
     const encoded = getEncodedScrollContainer();
-    if (!encoded) return;
-
-    const currentCount = Array.isArray(state.messages)
-        ? state.messages.length
-        : 0;
-
+    const currentCount = Array.isArray(state.messages) ? state.messages.length : 0;
     const newMessages = currentCount - lastRenderedMessagesCount;
 
     if (newMessages > 0) {
-
         if (shouldAutoFollow()) {
-
             scrollAllToBottom(true);
-
         } else {
-
             unseenMessagesCount += newMessages;
             userReadingOldMessages = true;
-
             updateScrollButton();
         }
+    } else {
+        if (shouldAutoFollow()) {
+            if (decodedPanel) {
+                decodedPanel.scrollTop = decodedPanel.scrollHeight;
+            }
+            if (encoded) {
+                encoded.scrollTop = encoded.scrollHeight;
+            }
+            userReadingOldMessages = false;
+            unseenMessagesCount = 0;
+        }
+        updateScrollButton();
     }
 
     lastRenderedMessagesCount = currentCount;
+}
+
+function bindEncodedScrollTarget() {
+    const encoded = getEncodedScrollContainer();
+    if (!encoded) return;
+    if (encoded.dataset.scrollBound === "1") return;
+
+    encoded.dataset.scrollBound = "1";
+    encoded.addEventListener("scroll", handleEncodedScroll);
 }
 
 scrollToBottomBtn.addEventListener("click", function () {
@@ -179,13 +189,10 @@ scrollToBottomBtn.addEventListener("click", function () {
 
 decodedPanel.addEventListener("scroll", handleDecodedScroll);
 
-const encodedContainer = getEncodedScrollContainer();
-
-if (encodedContainer) {
-    encodedContainer.addEventListener("scroll", handleEncodedScroll);
-}
+bindEncodedScrollTarget();
 
 window.addEventListener("resize", function () {
+    bindEncodedScrollTarget();
 
     if (shouldAutoFollow()) {
         scrollAllToBottom(true);
