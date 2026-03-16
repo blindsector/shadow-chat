@@ -192,6 +192,87 @@ async function toggleVoiceRecording() {
     }
 }
 
+let overlayMoveArmed = false;
+
+function getEncodedOverlayElement() {
+    return document.getElementById("encodedOverlay");
+}
+
+function setEncodedOverlayMoveArmed(armed) {
+    const overlay = getEncodedOverlayElement();
+    overlayMoveArmed = !!armed;
+
+    if (!overlay) return;
+
+    overlay.classList.toggle("move-armed", overlayMoveArmed);
+}
+
+function clampEncodedOverlayPosition(clientX, clientY, overlay) {
+    const rect = overlay.getBoundingClientRect();
+
+    const minLeft = 8;
+    const minTop = 8;
+    const maxLeft = Math.max(minLeft, window.innerWidth - rect.width - 8);
+    const maxTop = Math.max(minTop, window.innerHeight - rect.height - 8);
+
+    const left = Math.min(
+        maxLeft,
+        Math.max(minLeft, clientX - rect.width / 2)
+    );
+
+    const top = Math.min(
+        maxTop,
+        Math.max(minTop, clientY - rect.height / 2)
+    );
+
+    return { left, top };
+}
+
+function moveEncodedOverlayToPoint(clientX, clientY) {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+
+    const pos = clampEncodedOverlayPosition(clientX, clientY, overlay);
+
+    overlay.style.left = pos.left + "px";
+    overlay.style.top = pos.top + "px";
+    overlay.style.bottom = "auto";
+}
+
+function bindEncodedOverlayTapMove() {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay || overlay.dataset.moveBound === "1") return;
+
+    overlay.dataset.moveBound = "1";
+
+    overlay.addEventListener("pointerup", function (e) {
+        e.stopPropagation();
+        setEncodedOverlayMoveArmed(!overlayMoveArmed);
+    });
+
+    if (chatRoomScreen) {
+        chatRoomScreen.addEventListener("pointerup", function (e) {
+            if (!overlayMoveArmed) return;
+            if (overlay.contains(e.target)) return;
+
+            const interactiveTarget = e.target.closest(
+                "button, textarea, input, a, .composer-tools-menu, .emoji-picker, .message-menu"
+            );
+
+            if (interactiveTarget) return;
+
+            moveEncodedOverlayToPoint(e.clientX, e.clientY);
+            setEncodedOverlayMoveArmed(false);
+        });
+    }
+
+    window.addEventListener("resize", function () {
+        if (overlayMoveArmed) {
+            setEncodedOverlayMoveArmed(false);
+        }
+    });
+}
+
 function bindEvents() {
     loginBtn.addEventListener("click", login);
     registerBtn.addEventListener("click", register);
@@ -492,5 +573,6 @@ function bindEvents() {
         }
     }, true);
 
+    bindEncodedOverlayTapMove();
     syncComposerToolsVisibility();
 }
