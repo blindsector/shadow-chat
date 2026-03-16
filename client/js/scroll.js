@@ -19,6 +19,20 @@ let badgeFadeTimer = null;
 let lastBadgeVisible = false;
 let ignoreScrollEventsUntil = 0;
 
+function getActiveEncodedScrollContainer() {
+    if (
+        typeof encodedOverlay !== "undefined" &&
+        encodedOverlay &&
+        !encodedOverlay.classList.contains("hidden") &&
+        typeof encodedOverlayMessages !== "undefined" &&
+        encodedOverlayMessages
+    ) {
+        return encodedOverlayMessages;
+    }
+
+    return encodedPanel;
+}
+
 function getDistanceFromBottom(container) {
     return container.scrollHeight - container.scrollTop - container.clientHeight;
 }
@@ -33,16 +47,19 @@ function isNearBottom(container, threshold = NEAR_BOTTOM_THRESHOLD) {
 }
 
 function shouldAutoFollow() {
-    return isNearBottom(decodedPanel) && isNearBottom(encodedPanel);
+    const activeEncoded = getActiveEncodedScrollContainer();
+    return isNearBottom(decodedPanel) && isNearBottom(activeEncoded);
 }
 
 function shouldShowScrollButton() {
+    const activeEncoded = getActiveEncodedScrollContainer();
+
     const decodedDistance = getDistanceFromBottom(decodedPanel);
-    const encodedDistance = getDistanceFromBottom(encodedPanel);
+    const encodedDistance = getDistanceFromBottom(activeEncoded);
     const maxDistance = Math.max(decodedDistance, encodedDistance);
 
     const decodedThreshold = decodedPanel.clientHeight * SCROLL_BUTTON_SCREEN_THRESHOLD;
-    const encodedThreshold = encodedPanel.clientHeight * SCROLL_BUTTON_SCREEN_THRESHOLD;
+    const encodedThreshold = activeEncoded.clientHeight * SCROLL_BUTTON_SCREEN_THRESHOLD;
     const threshold = Math.max(decodedThreshold, encodedThreshold);
 
     return maxDistance > threshold;
@@ -185,8 +202,9 @@ function updateScrollButton() {
 }
 
 function rememberPanelHeights() {
+    const activeEncoded = getActiveEncodedScrollContainer();
     lastDecodedScrollHeight = decodedPanel.scrollHeight;
-    lastEncodedScrollHeight = encodedPanel.scrollHeight;
+    lastEncodedScrollHeight = activeEncoded.scrollHeight;
 }
 
 function stopActiveScrollAnimation() {
@@ -198,19 +216,33 @@ function stopActiveScrollAnimation() {
 }
 
 function setBothPanelsScrollTop(decodedTop, encodedTop) {
+    const activeEncoded = getActiveEncodedScrollContainer();
+
     markProgrammaticScroll(150);
     panelSyncLock = true;
     decodedPanel.scrollTop = clampScrollTop(decodedPanel, decodedTop);
-    encodedPanel.scrollTop = clampScrollTop(encodedPanel, encodedTop);
+    activeEncoded.scrollTop = clampScrollTop(activeEncoded, encodedTop);
     panelSyncLock = false;
 }
 
 function syncPanelsInstantFromDecoded() {
-    setBothPanelsScrollTop(decodedPanel.scrollTop, decodedPanel.scrollTop);
+    const activeEncoded = getActiveEncodedScrollContainer();
+    const ratio = decodedPanel.scrollHeight > decodedPanel.clientHeight
+        ? decodedPanel.scrollTop / Math.max(1, decodedPanel.scrollHeight - decodedPanel.clientHeight)
+        : 1;
+
+    const encodedMax = Math.max(0, activeEncoded.scrollHeight - activeEncoded.clientHeight);
+    setBothPanelsScrollTop(decodedPanel.scrollTop, encodedMax * ratio);
 }
 
 function syncPanelsInstantFromEncoded() {
-    setBothPanelsScrollTop(encodedPanel.scrollTop, encodedPanel.scrollTop);
+    const activeEncoded = getActiveEncodedScrollContainer();
+    const ratio = activeEncoded.scrollHeight > activeEncoded.clientHeight
+        ? activeEncoded.scrollTop / Math.max(1, activeEncoded.scrollHeight - activeEncoded.clientHeight)
+        : 1;
+
+    const decodedMax = Math.max(0, decodedPanel.scrollHeight - decodedPanel.clientHeight);
+    setBothPanelsScrollTop(decodedMax * ratio, activeEncoded.scrollTop);
 }
 
 function getSmoothDuration(distance) {
@@ -227,13 +259,15 @@ function easeInOutQuint(t) {
 }
 
 function animatePanelsToBottom() {
+    const activeEncoded = getActiveEncodedScrollContainer();
+
     stopActiveScrollAnimation();
 
     const startDecodedTop = decodedPanel.scrollTop;
-    const startEncodedTop = encodedPanel.scrollTop;
+    const startEncodedTop = activeEncoded.scrollTop;
 
     const targetDecodedTop = clampScrollTop(decodedPanel, decodedPanel.scrollHeight);
-    const targetEncodedTop = clampScrollTop(encodedPanel, encodedPanel.scrollHeight);
+    const targetEncodedTop = clampScrollTop(activeEncoded, activeEncoded.scrollHeight);
 
     const decodedDistance = targetDecodedTop - startDecodedTop;
     const encodedDistance = targetEncodedTop - startEncodedTop;
@@ -281,6 +315,8 @@ function animatePanelsToBottom() {
 }
 
 function scrollAllToBottom(force = false, smooth = true) {
+    const activeEncoded = getActiveEncodedScrollContainer();
+
     if (!force && userReadingOldMessages) {
         updateScrollButton();
         return;
@@ -295,14 +331,15 @@ function scrollAllToBottom(force = false, smooth = true) {
         animatePanelsToBottom();
     } else {
         stopActiveScrollAnimation();
-        setBothPanelsScrollTop(decodedPanel.scrollHeight, encodedPanel.scrollHeight);
+        setBothPanelsScrollTop(decodedPanel.scrollHeight, activeEncoded.scrollHeight);
         rememberPanelHeights();
     }
 }
 
 function keepCurrentReadingPosition() {
+    const activeEncoded = getActiveEncodedScrollContainer();
     stopActiveScrollAnimation();
-    setBothPanelsScrollTop(decodedPanel.scrollTop, encodedPanel.scrollTop);
+    setBothPanelsScrollTop(decodedPanel.scrollTop, activeEncoded.scrollTop);
 }
 
 function syncReadingStateFromScroll() {
@@ -381,11 +418,7 @@ function bindComposerAutoScroll() {
     }, { passive: true });
 }
 
-scrollToBottomBtn.addEventListener("click", () => {
-    scrollAllToBottom(true, true);
-});
-
-decodedPanel.addEventListener("scroll", () => {
+function handleDecodedPanelScroll() {
     if (panelSyncLock || shouldIgnoreScrollEvent()) {
         return;
     }
@@ -393,9 +426,9 @@ decodedPanel.addEventListener("scroll", () => {
     stopActiveScrollAnimation();
     syncPanelsInstantFromDecoded();
     syncReadingStateFromScroll();
-});
+}
 
-encodedPanel.addEventListener("scroll", () => {
+function handleEncodedPanelScroll() {
     if (panelSyncLock || shouldIgnoreScrollEvent()) {
         return;
     }
@@ -403,7 +436,18 @@ encodedPanel.addEventListener("scroll", () => {
     stopActiveScrollAnimation();
     syncPanelsInstantFromEncoded();
     syncReadingStateFromScroll();
+}
+
+scrollToBottomBtn.addEventListener("click", () => {
+    scrollAllToBottom(true, true);
 });
+
+decodedPanel.addEventListener("scroll", handleDecodedPanelScroll);
+encodedPanel.addEventListener("scroll", handleEncodedPanelScroll);
+
+if (typeof encodedOverlayMessages !== "undefined" && encodedOverlayMessages) {
+    encodedOverlayMessages.addEventListener("scroll", handleEncodedPanelScroll);
+}
 
 window.addEventListener("resize", () => {
     if (shouldAutoFollow()) {
