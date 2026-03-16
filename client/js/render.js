@@ -824,6 +824,14 @@ function renderEncodedOverlay(units) {
         typeof hasPendingAttachmentUpload === "function" &&
         hasPendingAttachmentUpload();
 
+    const recentUnits = Array.isArray(units) ? units : [];
+    recentUnits.forEach(function (unit) {
+        const text = getEncodedOverlayUnitText(unit);
+        if (text) {
+            appendEncodedOverlayItem(messages, text, "", unit);
+        }
+    });
+
     if (rawPreview || hasPendingAttachment) {
         const previewParts = [];
         const previewUnit = { sender_id: state.user && state.user.id };
@@ -845,14 +853,6 @@ function renderEncodedOverlay(units) {
             appendEncodedOverlayItem(messages, previewText, "is-preview", previewUnit);
         }
     }
-
-    const recentUnits = Array.isArray(units) ? units.slice(-6) : [];
-    recentUnits.forEach(function (unit) {
-        const text = getEncodedOverlayUnitText(unit);
-        if (text) {
-            appendEncodedOverlayItem(messages, text, "", unit);
-        }
-    });
 
     if (!messages.children.length) {
         appendEncodedOverlayItem(messages, "No encoded messages yet.", "is-empty", null);
