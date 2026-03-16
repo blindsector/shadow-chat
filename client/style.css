@@ -1580,6 +1580,8 @@ body {
 
 /* ENCODED OVERLAY */
 .encoded-overlay {
+    touch-action: none;
+    cursor: grab;
     position: fixed;
     top: max(10px, env(safe-area-inset-top, 0px));
     left: 12px;
@@ -1666,6 +1668,8 @@ body {
 
 @media (max-width: 900px) {
     .encoded-overlay {
+    touch-action: none;
+    cursor: grab;
         top: max(8px, env(safe-area-inset-top, 0px));
         left: 8px;
         width: min(250px, calc(100vw - 16px));
@@ -1679,6 +1683,8 @@ body {
 
 @media (max-width: 640px) {
     .encoded-overlay {
+    touch-action: none;
+    cursor: grab;
         top: auto;
         left: 8px;
         bottom: calc(88px + env(safe-area-inset-bottom, 0px));
@@ -1705,6 +1711,7 @@ body {
 
 
 .encoded-overlay.move-armed {
+    cursor: grabbing;
     box-shadow:
         0 0 0 1px rgba(125, 211, 252, 0.55),
         0 12px 34px rgba(0, 0, 0, 0.38);
