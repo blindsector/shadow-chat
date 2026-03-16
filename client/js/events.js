@@ -192,13 +192,22 @@ async function toggleVoiceRecording() {
     }
 }
 
-let overlayDragState = null;
+let overlayMoveArmed = false;
 
 function getEncodedOverlayElement() {
     return document.getElementById("encodedOverlay");
 }
 
-function clampEncodedOverlayPosition(left, top, overlay) {
+function setEncodedOverlayMoveArmed(armed) {
+    const overlay = getEncodedOverlayElement();
+    overlayMoveArmed = !!armed;
+
+    if (!overlay) return;
+
+    overlay.classList.toggle("move-armed", overlayMoveArmed);
+}
+
+function clampEncodedOverlayPosition(clientX, clientY, overlay) {
     const rect = overlay.getBoundingClientRect();
 
     const minLeft = 8;
@@ -206,105 +215,61 @@ function clampEncodedOverlayPosition(left, top, overlay) {
     const maxLeft = Math.max(minLeft, window.innerWidth - rect.width - 8);
     const maxTop = Math.max(minTop, window.innerHeight - rect.height - 8);
 
-    return {
-        left: Math.min(maxLeft, Math.max(minLeft, left)),
-        top: Math.min(maxTop, Math.max(minTop, top))
-    };
+    const left = Math.min(
+        maxLeft,
+        Math.max(minLeft, clientX - rect.width / 2)
+    );
+
+    const top = Math.min(
+        maxTop,
+        Math.max(minTop, clientY - rect.height / 2)
+    );
+
+    return { left, top };
 }
 
-function moveEncodedOverlayToPosition(left, top) {
+function moveEncodedOverlayToPoint(clientX, clientY) {
     const overlay = getEncodedOverlayElement();
     if (!overlay) return;
 
-    const pos = clampEncodedOverlayPosition(left, top, overlay);
+    const pos = clampEncodedOverlayPosition(clientX, clientY, overlay);
 
     overlay.style.left = pos.left + "px";
     overlay.style.top = pos.top + "px";
     overlay.style.bottom = "auto";
 }
 
-function startEncodedOverlayDrag(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay) return;
-
-    const interactiveTarget = e.target.closest(
-        "button, textarea, input, a, .composer-tools-menu, .emoji-picker, .message-menu"
-    );
-
-    if (interactiveTarget) return;
-
-    const rect = overlay.getBoundingClientRect();
-
-    overlayDragState = {
-        pointerId: e.pointerId,
-        offsetX: e.clientX - rect.left,
-        offsetY: e.clientY - rect.top
-    };
-
-    overlay.classList.add("move-armed");
-
-    if (typeof overlay.setPointerCapture === "function") {
-        try {
-            overlay.setPointerCapture(e.pointerId);
-        } catch (_) {}
-    }
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function handleEncodedOverlayDragMove(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay || !overlayDragState) return;
-    if (e.pointerId !== overlayDragState.pointerId) return;
-
-    const nextLeft = e.clientX - overlayDragState.offsetX;
-    const nextTop = e.clientY - overlayDragState.offsetY;
-
-    moveEncodedOverlayToPosition(nextLeft, nextTop);
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function stopEncodedOverlayDrag(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay || !overlayDragState) return;
-    if (e.pointerId !== overlayDragState.pointerId) return;
-
-    if (typeof overlay.releasePointerCapture === "function") {
-        try {
-            overlay.releasePointerCapture(e.pointerId);
-        } catch (_) {}
-    }
-
-    overlay.classList.remove("move-armed");
-    overlayDragState = null;
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function bindEncodedOverlayDragMove() {
+function bindEncodedOverlayTapMove() {
     const overlay = getEncodedOverlayElement();
     if (!overlay || overlay.dataset.moveBound === "1") return;
 
     overlay.dataset.moveBound = "1";
 
-    overlay.addEventListener("pointerdown", startEncodedOverlayDrag);
-    overlay.addEventListener("pointermove", handleEncodedOverlayDragMove);
-    overlay.addEventListener("pointerup", stopEncodedOverlayDrag);
-    overlay.addEventListener("pointercancel", stopEncodedOverlayDrag);
+    overlay.addEventListener("pointerup", function (e) {
+        e.stopPropagation();
+        setEncodedOverlayMoveArmed(!overlayMoveArmed);
+    });
+
+    if (chatRoomScreen) {
+        chatRoomScreen.addEventListener("pointerup", function (e) {
+            if (!overlayMoveArmed) return;
+            if (overlay.contains(e.target)) return;
+
+            const interactiveTarget = e.target.closest(
+                "button, textarea, input, a, .composer-tools-menu, .emoji-picker, .message-menu"
+            );
+
+            if (interactiveTarget) return;
+
+            moveEncodedOverlayToPoint(e.clientX, e.clientY);
+            setEncodedOverlayMoveArmed(false);
+        });
+    }
 
     window.addEventListener("resize", function () {
-        const currentOverlay = getEncodedOverlayElement();
-        if (!currentOverlay) return;
-
-        const rect = currentOverlay.getBoundingClientRect();
-        moveEncodedOverlayToPosition(rect.left, rect.top);
-
-        currentOverlay.classList.remove("move-armed");
-        overlayDragState = null;
+        if (overlayMoveArmed) {
+            setEncodedOverlayMoveArmed(false);
+        }
     });
 }
 
@@ -608,6 +573,6 @@ function bindEvents() {
         }
     }, true);
 
-    bindEncodedOverlayDragMove();
+    bindEncodedOverlayTapMove();
     syncComposerToolsVisibility();
 }
