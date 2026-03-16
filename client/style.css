@@ -1580,13 +1580,11 @@ body {
 
 /* ENCODED OVERLAY */
 .encoded-overlay {
-    touch-action: none;
-    cursor: grab;
     position: fixed;
     top: max(10px, env(safe-area-inset-top, 0px));
     left: 12px;
-    width: min(360px, calc(100vw - 24px));
-    max-height: min(320px, 48vh);
+    width: min(290px, calc(100vw - 24px));
+    max-height: min(240px, 38vh);
     background: linear-gradient(180deg, rgba(10, 18, 28, 0.96), rgba(18, 27, 38, 0.94));
     border: 1px solid rgba(120, 170, 255, 0.14);
     border-radius: 20px;
@@ -1616,18 +1614,18 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.4px;
     font-weight: 700;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
 }
 
 .encoded-overlay-messages {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     gap: 7px;
-    max-height: min(264px, 40vh);
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+    max-height: min(190px, 30vh);
+    overflow: hidden;
 }
 
 .encoded-overlay-item {
@@ -1672,29 +1670,24 @@ body {
 
 @media (max-width: 900px) {
     .encoded-overlay {
-    touch-action: none;
-    cursor: grab;
         top: max(8px, env(safe-area-inset-top, 0px));
         left: 8px;
-        width: min(310px, calc(100vw - 16px));
-        max-height: min(250px, 34vh);
+        width: min(250px, calc(100vw - 16px));
+        max-height: min(190px, 26vh);
     }
 
     .encoded-overlay-messages {
-        max-height: min(196px, 27vh);
-        overflow-y: auto;
+        max-height: min(142px, 19vh);
     }
 }
 
 @media (max-width: 640px) {
     .encoded-overlay {
-    touch-action: none;
-    cursor: grab;
         top: auto;
         left: 8px;
         bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-        width: min(270px, calc(100vw - 16px));
-        max-height: min(220px, 30dvh);
+        width: min(220px, calc(100vw - 16px));
+        max-height: min(170px, 22dvh);
     }
 
     .encoded-overlay-inner {
@@ -1703,8 +1696,7 @@ body {
     }
 
     .encoded-overlay-messages {
-        max-height: min(170px, 24dvh);
-        overflow-y: auto;
+        max-height: min(124px, 16dvh);
     }
 
     .encoded-overlay-item {
@@ -1717,56 +1709,36 @@ body {
 
 
 .encoded-overlay.move-armed {
-    cursor: grabbing;
     box-shadow:
         0 0 0 1px rgba(125, 211, 252, 0.55),
         0 12px 34px rgba(0, 0, 0, 0.38);
 }
 
 
-
-/* MAIN CHAT ONLY + OVERLAY */
-.panel-title-row {
-    display: none !important;
+.encoded-overlay.move-armed .encoded-overlay-header {
+    cursor: grabbing;
 }
 
-.chat-panels {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: minmax(0, 1fr) !important;
+.encoded-overlay-messages .message-stack {
+    flex-shrink: 0;
 }
 
-.encoded-panel {
-    display: none !important;
+.encoded-overlay-messages .bubble-shell {
+    width: 100%;
 }
 
-.decoded-panel,
-.panel {
-    min-height: 0;
+.encoded-overlay-messages .encoded-shell {
+    justify-content: inherit;
 }
 
-.decoded-panel {
-    display: flex;
-    flex-direction: column;
-}
-
-.panel {
-    display: flex;
-    flex-direction: column;
-}
-
-.message-column {
-    flex: 1 1 auto;
-    min-height: 100%;
-    justify-content: flex-end;
-}
-
-
-/* overlay drag from whole surface */
-.encoded-overlay-inner,
-.encoded-overlay-header,
-.encoded-overlay-messages,
-.encoded-overlay-item {
-    pointer-events: none;
-    user-select: none;
-    -webkit-user-select: none;
+.encoded-overlay-empty {
+    display: inline-block;
+    width: fit-content;
+    max-width: 92%;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 12px;
+    font-style: italic;
 }
