@@ -846,7 +846,7 @@ function renderEncodedOverlay(units) {
         }
     }
 
-    const recentUnits = Array.isArray(units) ? units.slice(-2) : [];
+    const recentUnits = Array.isArray(units) ? units.slice(-6) : [];
     recentUnits.forEach(function (unit) {
         const text = getEncodedOverlayUnitText(unit);
         if (text) {
