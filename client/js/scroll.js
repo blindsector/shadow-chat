@@ -445,8 +445,8 @@ scrollToBottomBtn.addEventListener("click", () => {
 decodedPanel.addEventListener("scroll", handleDecodedPanelScroll);
 encodedPanel.addEventListener("scroll", handleEncodedPanelScroll);
 
-if (typeof encodedOverlayMessages !== "undefined" && encodedOverlayMessages) {
-    encodedOverlayMessages.addEventListener("scroll", handleEncodedPanelScroll);
+if (typeof encodedMessages !== "undefined" && encodedMessages) {
+    encodedMessages.addEventListener("scroll", handleEncodedPanelScroll);
 }
 
 window.addEventListener("resize", () => {
