@@ -1679,10 +1679,11 @@ body {
 
 @media (max-width: 640px) {
     .encoded-overlay {
-        top: max(8px, env(safe-area-inset-top, 0px));
+        top: auto;
         left: 8px;
+        bottom: calc(88px + env(safe-area-inset-bottom, 0px));
         width: min(220px, calc(100vw - 16px));
-        max-height: min(170px, 22vh);
+        max-height: min(170px, 22dvh);
     }
 
     .encoded-overlay-inner {
@@ -1691,7 +1692,7 @@ body {
     }
 
     .encoded-overlay-messages {
-        max-height: min(124px, 16vh);
+        max-height: min(124px, 16dvh);
     }
 
     .encoded-overlay-item {
