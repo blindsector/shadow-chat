@@ -1724,6 +1724,7 @@ body {
 }
 
 
+
 /* MAIN CHAT ONLY + OVERLAY */
 .panel-title-row {
     display: none !important;
@@ -1731,8 +1732,30 @@ body {
 
 .chat-panels {
     grid-template-columns: 1fr !important;
+    grid-template-rows: minmax(0, 1fr) !important;
 }
 
 .encoded-panel {
     display: none !important;
+}
+
+.decoded-panel,
+.panel {
+    min-height: 0;
+}
+
+.decoded-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.message-column {
+    flex: 1 1 auto;
+    min-height: 100%;
+    justify-content: flex-end;
 }
