@@ -1750,18 +1750,28 @@ body {
 }
 
 .decoded-panel {
-    display: flex;
-    flex-direction: column;
+    display: block;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 .panel {
+    min-height: 0;
+}
+
+.decoded-panel > .message-column {
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    min-height: auto;
 }
 
-.message-column {
-    flex: 1 1 auto;
-    min-height: 100%;
-    justify-content: flex-end;
+.encoded-overlay-messages > .message-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 0 0 auto;
+    min-height: auto;
 }
-
