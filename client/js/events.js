@@ -245,31 +245,52 @@ function bindEncodedOverlayTapMove() {
 
     overlay.dataset.moveBound = "1";
 
-    overlay.addEventListener("pointerup", function (e) {
-        e.stopPropagation();
-        setEncodedOverlayMoveArmed(!overlayMoveArmed);
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    overlay.addEventListener("pointerdown", function (e) {
+        dragging = true;
+
+        const rect = overlay.getBoundingClientRect();
+
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        overlay.classList.add("move-armed");
+        overlay.setPointerCapture(e.pointerId);
     });
 
-    if (chatRoomScreen) {
-        chatRoomScreen.addEventListener("pointerup", function (e) {
-            if (!overlayMoveArmed) return;
-            if (overlay.contains(e.target)) return;
+    overlay.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
 
-            const interactiveTarget = e.target.closest(
-                "button, textarea, input, a, .composer-tools-menu, .emoji-picker, .message-menu"
-            );
+        const rect = overlay.getBoundingClientRect();
 
-            if (interactiveTarget) return;
+        const minLeft = 8;
+        const minTop = 8;
+        const maxLeft = window.innerWidth - rect.width - 8;
+        const maxTop = window.innerHeight - rect.height - 8;
 
-            moveEncodedOverlayToPoint(e.clientX, e.clientY);
-            setEncodedOverlayMoveArmed(false);
-        });
-    }
+        let left = e.clientX - offsetX;
+        let top = e.clientY - offsetY;
 
-    window.addEventListener("resize", function () {
-        if (overlayMoveArmed) {
-            setEncodedOverlayMoveArmed(false);
-        }
+        left = Math.max(minLeft, Math.min(maxLeft, left));
+        top = Math.max(minTop, Math.min(maxTop, top));
+
+        overlay.style.left = left + "px";
+        overlay.style.top = top + "px";
+        overlay.style.bottom = "auto";
+    });
+
+    overlay.addEventListener("pointerup", function (e) {
+        dragging = false;
+        overlay.classList.remove("move-armed");
+        overlay.releasePointerCapture(e.pointerId);
+    });
+
+    overlay.addEventListener("pointercancel", function () {
+        dragging = false;
+        overlay.classList.remove("move-armed");
     });
 }
 
