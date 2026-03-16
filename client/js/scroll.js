@@ -20,17 +20,18 @@ let lastBadgeVisible = false;
 let ignoreScrollEventsUntil = 0;
 
 function getActiveEncodedScrollContainer() {
-    if (
-        typeof encodedOverlay !== "undefined" &&
-        encodedOverlay &&
-        !encodedOverlay.classList.contains("hidden") &&
-        typeof encodedOverlayMessages !== "undefined" &&
-        encodedOverlayMessages
-    ) {
-        return encodedOverlayMessages;
+
+    // ако encodedMessages съществува -> той е реалният scroll контейнер
+    if (typeof encodedMessages !== "undefined" && encodedMessages) {
+        return encodedMessages;
     }
 
-    return encodedPanel;
+    // fallback за стария layout
+    if (typeof encodedPanel !== "undefined" && encodedPanel) {
+        return encodedPanel;
+    }
+
+    return decodedPanel;
 }
 
 function getDistanceFromBottom(container) {
