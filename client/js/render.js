@@ -183,7 +183,7 @@ function createReceiptMeta(item, isMe, isLastOwnMessage) {
 
     if (item.seen_at) {
         meta.style.opacity = "1";
-        meta.style.color = "#8b5cf6";
+        meta.style.color = "#7dd3fc";
     } else if (item.delivered_at) {
         meta.style.opacity = "0.7";
         meta.style.color = "";
@@ -568,7 +568,7 @@ function createEncodedBubble(unit, prevUnit) {
     stack.className = "message-stack";
     stack.dataset.messageId = unit.id;
     stack.dataset.itemType = item.type || "text";
-    stack.style.alignItems = isMe ? "flex-start" : "flex-end";
+    stack.style.alignItems = isMe ? "flex-end" : "flex-start";
 
     const timeMeta = createTimeMeta(item, showTimeAbove, "encoded");
     stack.appendChild(timeMeta);
@@ -577,6 +577,7 @@ function createEncodedBubble(unit, prevUnit) {
     bubble.className = "encoded-bubble " + (isMe ? "encoded-me" : "encoded-her");
     bubble.dataset.messageId = unit.id;
     bubble.dataset.itemType = item.type || "text";
+    bubble.style.alignSelf = isMe ? "flex-end" : "flex-start";
 
     const forwardLabel = createForwardLabel(unit.textItem || item);
     if (forwardLabel) {
@@ -696,101 +697,6 @@ function renderLivePreview() {
     chatMessages.appendChild(decodedStack);
 }
 
-
-
-function getOverlayElements() {
-    return {
-        overlay: document.getElementById("encodedOverlay"),
-        messages: document.getElementById("encodedOverlayMessages")
-    };
-}
-
-function createEncodedOverlayPreviewStack() {
-    const raw = messageInput && typeof messageInput.value === "string"
-        ? messageInput.value.trim()
-        : "";
-
-    const hasPendingAttachment =
-        typeof hasPendingAttachmentUpload === "function" &&
-        hasPendingAttachmentUpload();
-
-    if (!raw && !hasPendingAttachment) {
-        return null;
-    }
-
-    const stack = document.createElement("div");
-    stack.className = "message-stack";
-    stack.style.alignItems = "flex-end";
-
-    const bubble = document.createElement("div");
-    bubble.className = "encoded-bubble encoded-me preview-bubble";
-    bubble.style.alignSelf = "flex-end";
-
-    if (hasPendingAttachment) {
-        const pendingItem = createPendingAttachmentPreviewItem();
-        if (pendingItem) {
-            bubble.appendChild(makeFileCard(pendingItem));
-        }
-    }
-
-    if (raw) {
-        const encText = document.createElement("div");
-        encText.className = "message-text";
-        encText.textContent = encodeText(buildOutgoingText(raw));
-        encText.style.marginTop = hasPendingAttachment ? "10px" : "0";
-        bubble.appendChild(encText);
-    }
-
-    const shell = document.createElement("div");
-    shell.className = "bubble-shell encoded-shell preview-shell";
-    shell.appendChild(bubble);
-
-    stack.appendChild(shell);
-    return stack;
-}
-
-function renderEncodedOverlay(units) {
-    const refs = getOverlayElements();
-    const overlay = refs.overlay;
-    const messages = refs.messages;
-
-    if (!overlay || !messages) return;
-
-    const isChatVisible =
-        !!chatRoomScreen &&
-        chatRoomScreen.classList.contains("active") &&
-        !!state.activeChatId;
-
-    if (!isChatVisible) {
-        overlay.classList.add("hidden");
-        messages.innerHTML = "";
-        return;
-    }
-
-    messages.innerHTML = "";
-
-    const list = Array.isArray(units) ? units : [];
-    list.forEach(function (unit, index) {
-        const prevUnit = index > 0 ? list[index - 1] : null;
-        messages.appendChild(createEncodedBubble(unit, prevUnit));
-    });
-
-    const previewStack = createEncodedOverlayPreviewStack();
-    if (previewStack) {
-        messages.appendChild(previewStack);
-    }
-
-    if (!messages.children.length) {
-        const empty = document.createElement("div");
-        empty.className = "encoded-overlay-empty";
-        empty.textContent = "No encoded messages yet.";
-        messages.appendChild(empty);
-    }
-
-    overlay.classList.remove("hidden");
-    messages.scrollTop = messages.scrollHeight;
-}
-
 function renderConversation(forceScroll) {
     if (typeof forceScroll === "undefined") {
         forceScroll = false;
@@ -822,7 +728,7 @@ function renderConversation(forceScroll) {
     });
 
     renderLivePreview();
-    renderEncodedOverlay(units);
+    renderEncodedOverlay();
 
     state.lastConversationRenderSignature = nextConversationSignature;
     state.lastLivePreviewSignature = nextPreviewSignature;
@@ -837,3 +743,41 @@ function renderConversation(forceScroll) {
         }
     });
 }
+
+
+
+function getOverlayElements() {
+    return {
+        overlay: document.getElementById("encodedOverlay"),
+        messages: document.getElementById("encodedOverlayMessages")
+    };
+}
+
+function renderEncodedOverlay() {
+    const refs = getOverlayElements();
+    const overlay = refs.overlay;
+    const messages = refs.messages;
+
+    if (!overlay || !messages) return;
+
+    const isChatVisible =
+        !!chatRoomScreen &&
+        chatRoomScreen.classList.contains("active") &&
+        !!state.activeChatId;
+
+    if (!isChatVisible) {
+        overlay.classList.add("hidden");
+        messages.innerHTML = "";
+        return;
+    }
+
+    messages.innerHTML = "";
+
+    Array.from(encodedMessages.children).forEach(function (node) {
+        messages.appendChild(node.cloneNode(true));
+    });
+
+    overlay.classList.remove("hidden");
+    messages.scrollTop = messages.scrollHeight;
+}
+

@@ -192,6 +192,132 @@ async function toggleVoiceRecording() {
     }
 }
 
+
+let overlayDragState = null;
+let overlayHeaderTapTime = 0;
+
+function getEncodedOverlayElement() {
+    return document.getElementById("encodedOverlay");
+}
+
+function getEncodedOverlayHeader() {
+    const overlay = getEncodedOverlayElement();
+    return overlay ? overlay.querySelector(".encoded-overlay-header") : null;
+}
+
+function clampEncodedOverlayPosition(left, top, overlay) {
+    const rect = overlay.getBoundingClientRect();
+
+    const minLeft = 8;
+    const minTop = 8;
+    const maxLeft = Math.max(minLeft, window.innerWidth - rect.width - 8);
+    const maxTop = Math.max(minTop, window.innerHeight - rect.height - 8);
+
+    return {
+        left: Math.min(maxLeft, Math.max(minLeft, left)),
+        top: Math.min(maxTop, Math.max(minTop, top))
+    };
+}
+
+function moveEncodedOverlayToPosition(left, top) {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+
+    const pos = clampEncodedOverlayPosition(left, top, overlay);
+
+    overlay.style.left = pos.left + "px";
+    overlay.style.top = pos.top + "px";
+    overlay.style.bottom = "auto";
+}
+
+function toggleEncodedOverlayExpanded() {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+
+    overlay.classList.toggle("is-expanded");
+
+    requestAnimationFrame(function () {
+        const rect = overlay.getBoundingClientRect();
+        moveEncodedOverlayToPosition(rect.left, rect.top);
+    });
+}
+
+function startEncodedOverlayDrag(e) {
+    const overlay = getEncodedOverlayElement();
+    const header = getEncodedOverlayHeader();
+    if (!overlay || !header) return;
+    if (!header.contains(e.target)) return;
+
+    const now = Date.now();
+    if (now - overlayHeaderTapTime < 280) {
+        overlayHeaderTapTime = 0;
+        toggleEncodedOverlayExpanded();
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
+    overlayHeaderTapTime = now;
+
+    const rect = overlay.getBoundingClientRect();
+
+    overlayDragState = {
+        offsetX: e.clientX - rect.left,
+        offsetY: e.clientY - rect.top
+    };
+
+    overlay.classList.add("move-armed");
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function handleEncodedOverlayDragMove(e) {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay || !overlayDragState) return;
+
+    const nextLeft = e.clientX - overlayDragState.offsetX;
+    const nextTop = e.clientY - overlayDragState.offsetY;
+
+    moveEncodedOverlayToPosition(nextLeft, nextTop);
+
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function stopEncodedOverlayDrag(e) {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay || !overlayDragState) return;
+
+    overlay.classList.remove("move-armed");
+    overlayDragState = null;
+
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function bindEncodedOverlayTapMove() {
+    const overlay = getEncodedOverlayElement();
+    const header = getEncodedOverlayHeader();
+    if (!overlay || !header || overlay.dataset.moveBound === "1") return;
+
+    overlay.dataset.moveBound = "1";
+
+    header.addEventListener("pointerdown", startEncodedOverlayDrag);
+    window.addEventListener("pointermove", handleEncodedOverlayDragMove, { passive: false });
+    window.addEventListener("pointerup", stopEncodedOverlayDrag, { passive: false });
+    window.addEventListener("pointercancel", stopEncodedOverlayDrag, { passive: false });
+
+    window.addEventListener("resize", function () {
+        const currentOverlay = getEncodedOverlayElement();
+        if (!currentOverlay) return;
+
+        const rect = currentOverlay.getBoundingClientRect();
+        moveEncodedOverlayToPosition(rect.left, rect.top);
+        currentOverlay.classList.remove("move-armed");
+        overlayDragState = null;
+    });
+}
+
+
 function bindEvents() {
     loginBtn.addEventListener("click", login);
     registerBtn.addEventListener("click", register);
@@ -492,108 +618,6 @@ function bindEvents() {
         }
     }, true);
 
+    bindEncodedOverlayTapMove();
     syncComposerToolsVisibility();
 }
-let overlayDragState = null;
-
-function getEncodedOverlayElement() {
-    return document.getElementById("encodedOverlay");
-}
-
-function getEncodedOverlayDragHandle() {
-    const overlay = getEncodedOverlayElement();
-    return overlay ? overlay.querySelector(".encoded-overlay-header") : null;
-}
-
-function clampEncodedOverlayPosition(left, top, overlay) {
-    const rect = overlay.getBoundingClientRect();
-
-    const minLeft = 8;
-    const minTop = 8;
-    const maxLeft = Math.max(minLeft, window.innerWidth - rect.width - 8);
-    const maxTop = Math.max(minTop, window.innerHeight - rect.height - 8);
-
-    return {
-        left: Math.min(maxLeft, Math.max(minLeft, left)),
-        top: Math.min(maxTop, Math.max(minTop, top))
-    };
-}
-
-function moveEncodedOverlayToPosition(left, top) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay) return;
-
-    const pos = clampEncodedOverlayPosition(left, top, overlay);
-
-    overlay.style.left = pos.left + "px";
-    overlay.style.top = pos.top + "px";
-    overlay.style.bottom = "auto";
-}
-
-function startEncodedOverlayDrag(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay) return;
-
-    const rect = overlay.getBoundingClientRect();
-
-    overlayDragState = {
-        offsetX: e.clientX - rect.left,
-        offsetY: e.clientY - rect.top
-    };
-
-    overlay.classList.add("move-armed");
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function handleEncodedOverlayDragMove(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay || !overlayDragState) return;
-
-    moveEncodedOverlayToPosition(
-        e.clientX - overlayDragState.offsetX,
-        e.clientY - overlayDragState.offsetY
-    );
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function stopEncodedOverlayDrag(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay || !overlayDragState) return;
-
-    overlay.classList.remove("move-armed");
-    overlayDragState = null;
-
-    e.preventDefault();
-    e.stopPropagation();
-}
-
-function bindEncodedOverlayTapMove() {
-    const overlay = getEncodedOverlayElement();
-    const handle = getEncodedOverlayDragHandle();
-
-    if (!overlay || !handle || overlay.dataset.moveBound === "1") return;
-
-    overlay.dataset.moveBound = "1";
-
-    handle.addEventListener("pointerdown", startEncodedOverlayDrag);
-    window.addEventListener("pointermove", handleEncodedOverlayDragMove, { passive: false });
-    window.addEventListener("pointerup", stopEncodedOverlayDrag, { passive: false });
-    window.addEventListener("pointercancel", stopEncodedOverlayDrag, { passive: false });
-
-    window.addEventListener("resize", function () {
-        const currentOverlay = getEncodedOverlayElement();
-        if (!currentOverlay) return;
-
-        const rect = currentOverlay.getBoundingClientRect();
-        moveEncodedOverlayToPosition(rect.left, rect.top);
-
-        currentOverlay.classList.remove("move-armed");
-        overlayDragState = null;
-    });
-}
-
-
