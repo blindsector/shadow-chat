@@ -1759,3 +1759,14 @@ body {
     min-height: 100%;
     justify-content: flex-end;
 }
+
+
+/* overlay drag from whole surface */
+.encoded-overlay-inner,
+.encoded-overlay-header,
+.encoded-overlay-messages,
+.encoded-overlay-item {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
