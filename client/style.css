@@ -1753,3 +1753,35 @@ body {
     gap: 8px !important;
     padding-bottom: 2px !important;
 }
+
+.swap-chats-btn {
+    position: absolute;
+    left: 50%;
+    bottom: -14px;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 28px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(43,108,255,0.92), rgba(29,78,216,0.92));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    z-index: 12;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.swap-chats-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.42);
+}
+
+.swap-chats-btn:active {
+    transform: translateX(-50%) scale(0.94);
+}
