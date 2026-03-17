@@ -663,6 +663,17 @@ function keepEncodedPreviewPinnedToBottom() {
     });
 }
 
+function maybeKeepEncodedPreviewPinnedToBottom(forceScroll) {
+    if (forceScroll) {
+        keepEncodedPreviewPinnedToBottom();
+        return;
+    }
+
+    if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
+        keepEncodedPreviewPinnedToBottom();
+    }
+}
+
 function syncOverlayVisibilityNow() {
     const overlay = document.getElementById("encodedOverlay");
     if (!overlay) return;
@@ -773,7 +784,7 @@ function renderLivePreview() {
         chatMessages.appendChild(decodedStack);
     }
 
-    keepEncodedPreviewPinnedToBottom();
+    
 }
 
 function renderConversation(forceScroll) {
@@ -822,7 +833,7 @@ function renderConversation(forceScroll) {
             afterConversationRender();
         }
 
-        
+        maybeKeepEncodedPreviewPinnedToBottom(forceScroll);
         syncOverlayVisibilityNow();
     });
 }
@@ -839,7 +850,7 @@ function applyEncodedOverlayViewportLayout(viewport) {
 
     viewport.style.display = "flex";
     viewport.style.flexDirection = "column";
-    viewport.style.justifyContent = "flex-end";
+    viewport.style.justifyContent = "flex-start";
     viewport.style.overflowY = "auto";
     viewport.style.overflowX = "hidden";
     viewport.style.minHeight = "0";
@@ -849,10 +860,10 @@ function applyEncodedOverlayViewportLayout(viewport) {
 
     encodedMessages.style.display = "flex";
     encodedMessages.style.flexDirection = "column";
-    encodedMessages.style.justifyContent = "flex-end";
+    encodedMessages.style.justifyContent = "flex-start";
     encodedMessages.style.gap = "8px";
     encodedMessages.style.flex = "0 0 auto";
-    encodedMessages.style.minHeight = "100%";
+    encodedMessages.style.minHeight = "auto";
     encodedMessages.style.height = "auto";
     encodedMessages.style.maxHeight = "none";
     encodedMessages.style.overflow = "visible";
