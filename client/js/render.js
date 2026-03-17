@@ -718,7 +718,6 @@ function renderLivePreview() {
         hasPendingAttachmentUpload();
 
     if (!raw && !hasPendingAttachment) {
-        
         return;
     }
 
@@ -752,7 +751,12 @@ function renderLivePreview() {
     encShell.appendChild(encodedPreview);
 
     encodedStack.appendChild(encShell);
-    encodedMessages.appendChild(encodedStack);
+
+    if (!state.isSwapped) {
+        encodedMessages.appendChild(encodedStack);
+    } else {
+        chatMessages.appendChild(encodedStack);
+    }
 
     if (hasPendingAttachment) {
         const decodedStack = document.createElement("div");
@@ -781,12 +785,14 @@ function renderLivePreview() {
         decShell.appendChild(decodedPreview);
 
         decodedStack.appendChild(decShell);
-        chatMessages.appendChild(decodedStack);
+
+        if (!state.isSwapped) {
+            chatMessages.appendChild(decodedStack);
+        } else {
+            encodedMessages.appendChild(decodedStack);
+        }
     }
-
-    
 }
-
 function renderConversation(forceScroll) {
     if (typeof forceScroll === "undefined") {
         forceScroll = false;
@@ -911,13 +917,5 @@ function handleSwapChats() {
     state.isSwapped = !state.isSwapped;
 
     // просто re-render
-    renderConversation(true);
-}
-
-function handleSwapChats() {
-    if (!state) return;
-
-    state.isSwapped = !state.isSwapped;
-
     renderConversation(true);
 }
