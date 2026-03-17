@@ -1468,8 +1468,6 @@ body {
 
 .message-column {
     min-height: 100%;
-    display: flex;
-    flex-direction: column;
     justify-content: flex-end;
     padding-bottom: 0;
 }
@@ -1667,8 +1665,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: 100%;
-    justify-content: flex-end;
+    min-height: auto;
 }
 
 @media (max-width: 900px) {
