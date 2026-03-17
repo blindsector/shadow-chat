@@ -629,11 +629,37 @@ function createPendingAttachmentPreviewItem() {
     };
 }
 
+function getEncodedViewportScrollContainer() {
+    if (
+        typeof encodedOverlay !== "undefined" &&
+        encodedOverlay &&
+        !encodedOverlay.classList.contains("hidden") &&
+        typeof encodedOverlayMessages !== "undefined" &&
+        encodedOverlayMessages &&
+        typeof encodedMessages !== "undefined" &&
+        encodedMessages &&
+        encodedOverlayMessages.contains(encodedMessages)
+    ) {
+        return encodedOverlayMessages;
+    }
+
+    if (typeof encodedMessages !== "undefined" && encodedMessages) {
+        return encodedMessages;
+    }
+
+    if (typeof encodedPanel !== "undefined" && encodedPanel) {
+        return encodedPanel;
+    }
+
+    return null;
+}
+
 function keepEncodedPreviewPinnedToBottom() {
-    if (!encodedMessages) return;
+    const target = getEncodedViewportScrollContainer();
+    if (!target) return;
 
     requestAnimationFrame(function () {
-        encodedMessages.scrollTop = encodedMessages.scrollHeight;
+        target.scrollTop = target.scrollHeight;
     });
 }
 
@@ -654,7 +680,7 @@ function renderLivePreview() {
     encodedStack.style.alignItems = "flex-end";
 
     const encodedPreview = document.createElement("div");
-    encodedPreview.className = "encoded-bubble encoded-her preview-bubble";
+    encodedPreview.className = "encoded-bubble encoded-me preview-bubble";
     encodedPreview.dataset.preview = "1";
     encodedPreview.style.alignSelf = "flex-end";
 
@@ -757,10 +783,10 @@ function renderConversation(forceScroll) {
         } else {
             afterConversationRender();
         }
+
+        keepEncodedPreviewPinnedToBottom();
     });
 }
-
-
 
 function getOverlayElements() {
     return {
@@ -775,19 +801,26 @@ function applyEncodedOverlayViewportLayout(viewport) {
     viewport.style.display = "flex";
     viewport.style.flexDirection = "column";
     viewport.style.justifyContent = "flex-end";
-    viewport.style.overflow = "hidden";
+    viewport.style.overflowY = "auto";
+    viewport.style.overflowX = "hidden";
     viewport.style.minHeight = "0";
+    viewport.style.height = "100%";
+    viewport.style.webkitOverflowScrolling = "touch";
+    viewport.style.overscrollBehavior = "contain";
+    viewport.style.padding = "10px";
+    viewport.style.gap = "8px";
 
     encodedMessages.style.display = "flex";
     encodedMessages.style.flexDirection = "column";
     encodedMessages.style.justifyContent = "flex-end";
     encodedMessages.style.gap = "8px";
-    encodedMessages.style.height = "100%";
+    encodedMessages.style.flex = "1 0 auto";
     encodedMessages.style.minHeight = "100%";
-    encodedMessages.style.maxHeight = "100%";
-    encodedMessages.style.overflowY = "auto";
-    encodedMessages.style.overflowX = "hidden";
-    encodedMessages.style.webkitOverflowScrolling = "touch";
+    encodedMessages.style.height = "auto";
+    encodedMessages.style.maxHeight = "none";
+    encodedMessages.style.overflowY = "visible";
+    encodedMessages.style.overflowX = "visible";
+    encodedMessages.style.webkitOverflowScrolling = "auto";
     encodedMessages.style.paddingBottom = "2px";
 }
 
@@ -817,4 +850,3 @@ function renderEncodedOverlay() {
 
     keepEncodedPreviewPinnedToBottom();
 }
-
