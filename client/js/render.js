@@ -551,9 +551,13 @@ function createDecodedBubble(unit, prevUnit, lastOwnUnitId) {
     stack.appendChild(shell);
 
     const receiptMeta = createReceiptMeta(item, isMe, isLastOwnMessage);
+
     if (receiptMeta) {
+    if (!state.isSwapped) {
+        // нормално → decoded е main
         stack.appendChild(receiptMeta);
     }
+}
 
     return stack;
 }
@@ -610,6 +614,18 @@ function createEncodedBubble(unit, prevUnit) {
     attachTimeReveal(bubble, timeMeta, item, showTimeAbove, "encoded");
 
     stack.appendChild(createBubbleShell(bubble, item, true));
+    const isLastOwnMessage =
+    Number(unit.sender_id) === Number(state.user.id) &&
+    unit.id === findLastOwnRenderUnitId(buildRenderUnits(state.messages));
+
+    const receiptMeta = createReceiptMeta(item, isMe, isLastOwnMessage);
+
+    if (receiptMeta) {
+    if (state.isSwapped) {
+        // при swap → encoded става main
+        stack.appendChild(receiptMeta);
+    }
+}
     return stack;
 }
 
