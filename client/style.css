@@ -1665,7 +1665,9 @@ body {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    min-height: auto;
+    min-height: 100%;
+    justify-content: flex-end;
+}
 }
 
 @media (max-width: 900px) {
