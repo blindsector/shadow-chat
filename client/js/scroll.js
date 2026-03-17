@@ -7,26 +7,19 @@ const NEAR_BOTTOM_THRESHOLD = 60;
 let panelSyncLock = false;
 let currentEncodedScrollTarget = null;
 
+/*
+    FIX 1:
+    ВИНАГИ използваме encodedMessages като scroll контейнер,
+    защото той реално се мести в балона.
+*/
 function getEncodedScrollContainer() {
-    if (
-        typeof encodedOverlay !== "undefined" &&
-        encodedOverlay &&
-        !encodedOverlay.classList.contains("hidden") &&
-        typeof encodedOverlayMessages !== "undefined" &&
-        encodedOverlayMessages &&
-        typeof encodedMessages !== "undefined" &&
-        encodedMessages &&
-        encodedOverlayMessages.contains(encodedMessages)
-    ) {
-        return encodedMessages;
-    }
-
-    if (typeof encodedPanel !== "undefined" && encodedPanel && encodedPanel.offsetParent !== null) {
-        return encodedPanel;
-    }
 
     if (typeof encodedMessages !== "undefined" && encodedMessages) {
         return encodedMessages;
+    }
+
+    if (typeof encodedPanel !== "undefined" && encodedPanel) {
+        return encodedPanel;
     }
 
     return null;
@@ -82,7 +75,24 @@ function syncFromEncoded() {
     panelSyncLock = false;
 }
 
+/*
+    FIX 2:
+    Force bottom когато клавиатура / preview / нови съобщения
+*/
+function forceStickToBottom() {
+    const encoded = getEncodedScrollContainer();
+
+    if (decodedPanel) {
+        decodedPanel.scrollTop = decodedPanel.scrollHeight;
+    }
+
+    if (encoded) {
+        encoded.scrollTop = encoded.scrollHeight;
+    }
+}
+
 function scrollAllToBottom(force = false) {
+
     const encoded = getEncodedScrollContainer();
     if (!decodedPanel) return;
 
@@ -92,11 +102,7 @@ function scrollAllToBottom(force = false) {
 
     panelSyncLock = true;
 
-    decodedPanel.scrollTop = decodedPanel.scrollHeight;
-
-    if (encoded) {
-        encoded.scrollTop = encoded.scrollHeight;
-    }
+    forceStickToBottom();
 
     panelSyncLock = false;
 
@@ -123,7 +129,7 @@ function handleDecodedScroll() {
 
     syncFromDecoded();
 
-    if (shouldAutoFollow()) {
+    if (isNearBottom(decodedPanel)) {
         userReadingOldMessages = false;
         unseenMessagesCount = 0;
     } else {
@@ -138,7 +144,9 @@ function handleEncodedScroll() {
 
     syncFromEncoded();
 
-    if (shouldAutoFollow()) {
+    const encoded = getEncodedScrollContainer();
+
+    if (encoded && isNearBottom(encoded)) {
         userReadingOldMessages = false;
         unseenMessagesCount = 0;
     } else {
@@ -148,45 +156,60 @@ function handleEncodedScroll() {
     updateScrollButton();
 }
 
+/*
+    FIX 3:
+    ВИНАГИ stick to bottom ако си долу
+*/
 function afterConversationRender() {
+
     const encoded = getEncodedScrollContainer();
     const currentCount = Array.isArray(state.messages) ? state.messages.length : 0;
     const newMessages = currentCount - lastRenderedMessagesCount;
 
     bindEncodedScrollTarget();
 
+    const stayAtBottom = shouldAutoFollow();
+
     if (newMessages > 0) {
-        if (shouldAutoFollow()) {
-            scrollAllToBottom(true);
+
+        if (stayAtBottom) {
+
+            requestAnimationFrame(forceStickToBottom);
+
         } else {
+
             unseenMessagesCount += newMessages;
             userReadingOldMessages = true;
             updateScrollButton();
         }
+
     } else {
-        if (shouldAutoFollow()) {
-            if (decodedPanel) {
-                decodedPanel.scrollTop = decodedPanel.scrollHeight;
-            }
-            if (encoded) {
-                encoded.scrollTop = encoded.scrollHeight;
-            }
+
+        if (stayAtBottom) {
+
+            requestAnimationFrame(forceStickToBottom);
+
             userReadingOldMessages = false;
             unseenMessagesCount = 0;
         }
+
         updateScrollButton();
     }
 
     lastRenderedMessagesCount = currentCount;
 }
 
+/*
+    FIX 4:
+    винаги слушаме encodedMessages
+*/
 function bindEncodedScrollTarget() {
+
     const encoded = getEncodedScrollContainer();
     if (!encoded) return;
 
     if (currentEncodedScrollTarget && currentEncodedScrollTarget !== encoded) {
         currentEncodedScrollTarget.removeEventListener("scroll", handleEncodedScroll);
-        delete currentEncodedScrollTarget.dataset.scrollBound;
     }
 
     currentEncodedScrollTarget = encoded;
@@ -205,10 +228,15 @@ decodedPanel.addEventListener("scroll", handleDecodedScroll, { passive: true });
 
 bindEncodedScrollTarget();
 
+/*
+    FIX 5:
+    клавиатура / resize → винаги долу
+*/
 window.addEventListener("resize", function () {
+
     bindEncodedScrollTarget();
 
     if (shouldAutoFollow()) {
-        scrollAllToBottom(true);
+        setTimeout(forceStickToBottom, 50);
     }
 });
