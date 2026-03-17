@@ -888,13 +888,55 @@ function renderEncodedOverlay() {
         return;
     }
 
-    if (!viewport.contains(encodedMessages)) {
-        viewport.appendChild(encodedMessages);
+    if (!state.isSwapped) {
+        if (!viewport.contains(encodedMessages)) {
+            viewport.appendChild(encodedMessages);
+        }
+    } else {
+        if (!viewport.contains(chatMessages)) {
+            viewport.appendChild(chatMessages);
+        }
     }
 
     applyEncodedOverlayViewportLayout(viewport);
-
     overlay.classList.remove("hidden");
+}
 
-    
+function handleSwapChats() {
+    if (typeof state === "undefined") return;
+
+    state.isSwapped = !state.isSwapped;
+
+    const overlayViewport = document.getElementById("encodedOverlayMessages");
+    const decodedPanelEl = typeof decodedPanel !== "undefined" ? decodedPanel : null;
+
+    if (!overlayViewport || !decodedPanelEl) return;
+
+    if (!state.isSwapped) {
+        if (!overlayViewport.contains(encodedMessages)) {
+            overlayViewport.appendChild(encodedMessages);
+        }
+
+        if (!decodedPanelEl.contains(chatMessages)) {
+            decodedPanelEl.appendChild(chatMessages);
+        }
+    } else {
+        if (!overlayViewport.contains(chatMessages)) {
+            overlayViewport.appendChild(chatMessages);
+        }
+
+        if (!decodedPanelEl.contains(encodedMessages)) {
+            decodedPanelEl.appendChild(encodedMessages);
+        }
+    }
+
+    if (typeof bindEncodedScrollTarget === "function") {
+        bindEncodedScrollTarget();
+    }
+
+    if (typeof scrollAllToBottom === "function") {
+        requestAnimationFrame(function () {
+            scrollAllToBottom(true);
+        });
+    }
 }
