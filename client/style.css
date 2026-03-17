@@ -1568,18 +1568,16 @@ body {
 .encoded-overlay-messages {
     flex: 1 1 auto;
     min-height: 0;
+    height: 100%;
 
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
+    touch-action: pan-y;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-
-    gap: 8px;
+    display: block;
     padding: 10px;
 }
 
@@ -1589,8 +1587,26 @@ body {
     justify-content: flex-end;
     gap: 8px;
 
-    flex: 0 0 auto;
     min-height: 100%;
+    height: auto;
+
+    overflow: visible !important;
+    padding-right: 2px;
+}
+
+.encoded-overlay-messages .encoded-shell {
+    width: 100%;
+    display: flex;
+}
+
+.encoded-overlay-messages .message-stack.stack-me .encoded-shell,
+.encoded-overlay-messages .message-stack[style*="align-items: flex-end"] .encoded-shell {
+    justify-content: flex-end;
+}
+
+.encoded-overlay-messages .message-stack.stack-him .encoded-shell,
+.encoded-overlay-messages .message-stack[style*="align-items: flex-start"] .encoded-shell {
+    justify-content: flex-start;
 }
 
 .encoded-overlay-messages .message-stack {
