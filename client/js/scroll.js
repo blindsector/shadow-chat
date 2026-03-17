@@ -158,6 +158,12 @@ function afterConversationRender() {
 
     bindEncodedScrollTarget();
 
+    if (lastRenderedMessagesCount === 0) {
+            requestAnimationFrame(function () {
+                forceStickToBottom();
+            });
+        }
+
     if (newMessages > 0) {
         if (shouldAutoFollow()) {
             requestAnimationFrame(function () {
