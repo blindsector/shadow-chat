@@ -1709,16 +1709,19 @@ body {
 .encoded-overlay {
     display: flex !important;
     flex-direction: column !important;
-    overflow: hidden !important;
+    overflow: visible !important;
 }
 
 .encoded-overlay-inner {
+    position: relative !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100% !important;
     min-height: 0 !important;
     padding: 0 !important;
     gap: 0 !important;
+    overflow: hidden !important;
+    border-radius: 20px !important;
 }
 
 .encoded-overlay-header {
@@ -1757,43 +1760,43 @@ body {
 .swap-chats-btn {
     position: absolute;
     left: 50%;
-    bottom: -12px;
+    bottom: -10px;
     transform: translateX(-50%);
-    min-width: 52px;
-    height: 24px;
-    padding: 0 14px;
+    min-width: 44px;
+    height: 20px;
+    padding: 0 10px;
     border-radius: 999px;
-    background: linear-gradient(180deg, rgba(36, 88, 210, 0.96), rgba(24, 63, 168, 0.96));
+    background: linear-gradient(180deg, rgba(42, 98, 230, 0.96), rgba(28, 72, 184, 0.96));
     border: 1px solid rgba(255, 255, 255, 0.10);
     display: flex;
     align-items: center;
     justify-content: center;
     color: rgba(255, 255, 255, 0.92);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.35px;
+    letter-spacing: 0.28px;
     text-transform: lowercase;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
-    z-index: 20;
+    z-index: 24;
     box-shadow:
-        0 8px 20px rgba(0, 0, 0, 0.28),
-        0 2px 6px rgba(43, 108, 255, 0.22);
+        0 6px 16px rgba(0, 0, 0, 0.26),
+        0 2px 5px rgba(43, 108, 255, 0.20);
     transition: transform 0.16s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .swap-chats-btn:hover {
     transform: translateX(-50%) translateY(-1px);
     box-shadow:
-        0 10px 24px rgba(0, 0, 0, 0.32),
-        0 4px 10px rgba(43, 108, 255, 0.28);
+        0 8px 18px rgba(0, 0, 0, 0.30),
+        0 3px 7px rgba(43, 108, 255, 0.24);
     filter: brightness(1.04);
 }
 
 .swap-chats-btn:active {
-    transform: translateX(-50%) translateY(1px) scale(0.97);
+    transform: translateX(-50%) scale(0.96);
     box-shadow:
-        0 5px 14px rgba(0, 0, 0, 0.24),
-        0 2px 6px rgba(43, 108, 255, 0.18);
+        0 4px 10px rgba(0, 0, 0, 0.22),
+        0 2px 4px rgba(43, 108, 255, 0.16);
 }

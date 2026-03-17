@@ -647,6 +647,16 @@ function bindEvents() {
         }
     }, true);
 
-    bindEncodedOverlayTapMove();
-    syncComposerToolsVisibility();
+    if (swapChatsBtn) {
+    swapChatsBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        if (typeof handleSwapChats === "function") {
+            handleSwapChats();
+        }
+    });
+}
+
+bindEncodedOverlayTapMove();
+syncComposerToolsVisibility();
 }
