@@ -1568,27 +1568,29 @@ body {
 .encoded-overlay-messages {
     flex: 1 1 auto;
     min-height: 0;
-    overflow: hidden;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
+
     gap: 8px;
     padding: 10px;
 }
 
 .encoded-overlay-messages > .message-column {
-    flex: 1 1 auto;
-    min-height: 0;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     gap: 8px;
-    padding-right: 2px;
+
+    flex: 0 0 auto;
+    min-height: 100%;
 }
 
 .encoded-overlay-messages .message-stack {

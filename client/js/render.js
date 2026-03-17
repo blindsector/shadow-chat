@@ -643,12 +643,12 @@ function getEncodedViewportScrollContainer() {
         return encodedOverlayMessages;
     }
 
-    if (typeof encodedMessages !== "undefined" && encodedMessages) {
-        return encodedMessages;
-    }
-
     if (typeof encodedPanel !== "undefined" && encodedPanel) {
         return encodedPanel;
+    }
+
+    if (typeof encodedMessages !== "undefined" && encodedMessages) {
+        return encodedMessages;
     }
 
     return null;
@@ -661,6 +661,43 @@ function keepEncodedPreviewPinnedToBottom() {
     requestAnimationFrame(function () {
         target.scrollTop = target.scrollHeight;
     });
+}
+
+function syncOverlayVisibilityNow() {
+    const overlay = document.getElementById("encodedOverlay");
+    if (!overlay) return;
+
+    const isChatVisible =
+        !!chatRoomScreen &&
+        chatRoomScreen.classList.contains("active") &&
+        !!state.activeChatId;
+
+    if (!isChatVisible) {
+        overlay.classList.add("hidden");
+    } else {
+        overlay.classList.remove("hidden");
+    }
+}
+
+let overlayScreenObserverBound = false;
+
+function ensureOverlayScreenObserver() {
+    if (overlayScreenObserverBound) return;
+    if (!chatRoomScreen) return;
+
+    overlayScreenObserverBound = true;
+
+    const observer = new MutationObserver(function () {
+        syncOverlayVisibilityNow();
+    });
+
+    observer.observe(chatRoomScreen, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+
+    window.addEventListener("popstate", syncOverlayVisibilityNow);
+    document.addEventListener("visibilitychange", syncOverlayVisibilityNow);
 }
 
 function renderLivePreview() {
@@ -752,6 +789,7 @@ function renderConversation(forceScroll) {
         state.lastConversationRenderSignature === nextConversationSignature &&
         state.lastLivePreviewSignature === nextPreviewSignature
     ) {
+        syncOverlayVisibilityNow();
         return;
     }
 
@@ -785,6 +823,7 @@ function renderConversation(forceScroll) {
         }
 
         keepEncodedPreviewPinnedToBottom();
+        syncOverlayVisibilityNow();
     });
 }
 
@@ -807,20 +846,16 @@ function applyEncodedOverlayViewportLayout(viewport) {
     viewport.style.height = "100%";
     viewport.style.webkitOverflowScrolling = "touch";
     viewport.style.overscrollBehavior = "contain";
-    viewport.style.padding = "10px";
-    viewport.style.gap = "8px";
 
     encodedMessages.style.display = "flex";
     encodedMessages.style.flexDirection = "column";
     encodedMessages.style.justifyContent = "flex-end";
     encodedMessages.style.gap = "8px";
-    encodedMessages.style.flex = "1 0 auto";
+    encodedMessages.style.flex = "0 0 auto";
     encodedMessages.style.minHeight = "100%";
     encodedMessages.style.height = "auto";
     encodedMessages.style.maxHeight = "none";
-    encodedMessages.style.overflowY = "visible";
-    encodedMessages.style.overflowX = "visible";
-    encodedMessages.style.webkitOverflowScrolling = "auto";
+    encodedMessages.style.overflow = "visible";
     encodedMessages.style.paddingBottom = "2px";
 }
 
@@ -829,6 +864,8 @@ function renderEncodedOverlay() {
     const viewport = document.getElementById("encodedOverlayMessages");
 
     if (!overlay || !viewport || !encodedMessages) return;
+
+    ensureOverlayScreenObserver();
 
     const isChatVisible =
         !!chatRoomScreen &&
