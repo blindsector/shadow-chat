@@ -707,7 +707,7 @@ function renderLivePreview() {
         hasPendingAttachmentUpload();
 
     if (!raw && !hasPendingAttachment) {
-        keepEncodedPreviewPinnedToBottom();
+        
         return;
     }
 
@@ -822,7 +822,7 @@ function renderConversation(forceScroll) {
             afterConversationRender();
         }
 
-        keepEncodedPreviewPinnedToBottom();
+        
         syncOverlayVisibilityNow();
     });
 }
@@ -885,5 +885,5 @@ function renderEncodedOverlay() {
 
     overlay.classList.remove("hidden");
 
-    keepEncodedPreviewPinnedToBottom();
+    
 }
