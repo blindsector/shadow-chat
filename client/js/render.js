@@ -853,20 +853,27 @@ function renderConversation(forceScroll) {
     state.lastLivePreviewSignature = nextPreviewSignature;
 
     requestAnimationFrame(function () {
-        restoreAudioPlaybackState(audioState);
+    restoreAudioPlaybackState(audioState);
 
-        if (forceScroll) {
+    if (forceScroll) {
+        scrollAllToBottom(true);
+    } else {
+        afterConversationRender();
+    }
+
+    // 🔥 FIX за preview + image scroll
+    requestAnimationFrame(function () {
+        if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
             scrollAllToBottom(true);
-        } else {
-            afterConversationRender();
         }
+    });
 
         maybeKeepEncodedPreviewPinnedToBottom(forceScroll);
         syncOverlayVisibilityNow();
-    });
+   });
 }
 
-function getOverlayElements() {
+    function getOverlayElements() {
     return {
         overlay: document.getElementById("encodedOverlay"),
         messages: document.getElementById("encodedOverlayMessages")
