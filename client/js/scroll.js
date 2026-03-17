@@ -1,6 +1,7 @@
 let userReadingOldMessages = false;
 let unseenMessagesCount = 0;
 let lastRenderedMessagesCount = 0;
+let lastRenderedChatKey = "";
 
 const NEAR_BOTTOM_THRESHOLD = 60;
 
@@ -155,16 +156,23 @@ function handleEncodedScroll() {
 function afterConversationRender() {
     const currentCount = Array.isArray(state.messages) ? state.messages.length : 0;
     const newMessages = currentCount - lastRenderedMessagesCount;
+    const currentChatKey = String(state.activeChatType || "") + ":" + String(state.activeChatId || "");
 
     bindEncodedScrollTarget();
 
-    if (lastRenderedMessagesCount === 0) {
+    const switchedChat = currentChatKey !== lastRenderedChatKey;
+
+    if (switchedChat) {
+        userReadingOldMessages = false;
+        unseenMessagesCount = 0;
+        updateScrollButton();
+
+        requestAnimationFrame(function () {
             requestAnimationFrame(function () {
                 forceStickToBottom();
             });
-        }
-
-    if (newMessages > 0) {
+        });
+    } else if (newMessages > 0) {
         if (shouldAutoFollow()) {
             requestAnimationFrame(function () {
                 forceStickToBottom();
@@ -184,6 +192,7 @@ function afterConversationRender() {
     }
 
     lastRenderedMessagesCount = currentCount;
+    lastRenderedChatKey = currentChatKey;
 }
 
 function bindEncodedScrollTarget() {
