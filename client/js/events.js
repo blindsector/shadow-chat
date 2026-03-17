@@ -192,9 +192,10 @@ async function toggleVoiceRecording() {
     }
 }
 
-
 let overlayDragState = null;
 let overlayHeaderTapTime = 0;
+const OVERLAY_DRAG_THRESHOLD = 8;
+const OVERLAY_DOUBLE_TAP_MS = 280;
 
 function getEncodedOverlayElement() {
     return document.getElementById("encodedOverlay");
@@ -249,30 +250,41 @@ function startEncodedOverlayDrag(e) {
     if (!header.contains(e.target)) return;
 
     const now = Date.now();
-    if (now - overlayHeaderTapTime < 280) {
-        overlayHeaderTapTime = 0;
-        toggleEncodedOverlayExpanded();
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-    }
-    overlayHeaderTapTime = now;
-
-    const rect = overlay.getBoundingClientRect();
 
     overlayDragState = {
-        offsetX: e.clientX - rect.left,
-        offsetY: e.clientY - rect.top
+        pointerId: typeof e.pointerId === "number" ? e.pointerId : null,
+        startX: e.clientX,
+        startY: e.clientY,
+        offsetX: e.clientX - overlay.getBoundingClientRect().left,
+        offsetY: e.clientY - overlay.getBoundingClientRect().top,
+        startedAt: now,
+        moved: false
     };
 
     overlay.classList.add("move-armed");
-    e.preventDefault();
-    e.stopPropagation();
+
+    if (header.setPointerCapture && typeof e.pointerId === "number") {
+        try {
+            header.setPointerCapture(e.pointerId);
+        } catch (err) {}
+    }
 }
 
 function handleEncodedOverlayDragMove(e) {
     const overlay = getEncodedOverlayElement();
     if (!overlay || !overlayDragState) return;
+    if (overlayDragState.pointerId !== null && e.pointerId !== overlayDragState.pointerId) return;
+
+    const dx = e.clientX - overlayDragState.startX;
+    const dy = e.clientY - overlayDragState.startY;
+
+    if (!overlayDragState.moved) {
+        const distance = Math.hypot(dx, dy);
+        if (distance < OVERLAY_DRAG_THRESHOLD) {
+            return;
+        }
+        overlayDragState.moved = true;
+    }
 
     const nextLeft = e.clientX - overlayDragState.offsetX;
     const nextTop = e.clientY - overlayDragState.offsetY;
@@ -280,18 +292,36 @@ function handleEncodedOverlayDragMove(e) {
     moveEncodedOverlayToPosition(nextLeft, nextTop);
 
     e.preventDefault();
-    e.stopPropagation();
 }
 
 function stopEncodedOverlayDrag(e) {
     const overlay = getEncodedOverlayElement();
+    const header = getEncodedOverlayHeader();
     if (!overlay || !overlayDragState) return;
+    if (overlayDragState.pointerId !== null && e.pointerId !== overlayDragState.pointerId) return;
+
+    const wasMove = overlayDragState.moved;
+    const now = Date.now();
 
     overlay.classList.remove("move-armed");
-    overlayDragState = null;
 
-    e.preventDefault();
-    e.stopPropagation();
+    if (!wasMove) {
+        if (now - overlayHeaderTapTime < OVERLAY_DOUBLE_TAP_MS) {
+            overlayHeaderTapTime = 0;
+            toggleEncodedOverlayExpanded();
+            e.preventDefault();
+        } else {
+            overlayHeaderTapTime = now;
+        }
+    }
+
+    if (header && header.releasePointerCapture && typeof e.pointerId === "number") {
+        try {
+            header.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+    }
+
+    overlayDragState = null;
 }
 
 function bindEncodedOverlayTapMove() {
@@ -301,7 +331,7 @@ function bindEncodedOverlayTapMove() {
 
     overlay.dataset.moveBound = "1";
 
-    header.addEventListener("pointerdown", startEncodedOverlayDrag);
+    header.addEventListener("pointerdown", startEncodedOverlayDrag, { passive: true });
     window.addEventListener("pointermove", handleEncodedOverlayDragMove, { passive: false });
     window.addEventListener("pointerup", stopEncodedOverlayDrag, { passive: false });
     window.addEventListener("pointercancel", stopEncodedOverlayDrag, { passive: false });
@@ -316,7 +346,6 @@ function bindEncodedOverlayTapMove() {
         overlayDragState = null;
     });
 }
-
 
 function bindEvents() {
     loginBtn.addEventListener("click", login);
@@ -559,7 +588,7 @@ function bindEvents() {
         renderConversation(false);
 
         if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
-            scrollAllToBottom(true, false);
+            scrollAllToBottom(true);
         } else if (typeof updateScrollButton === "function") {
             updateScrollButton();
         }

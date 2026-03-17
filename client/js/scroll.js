@@ -5,6 +5,7 @@ let lastRenderedMessagesCount = 0;
 const NEAR_BOTTOM_THRESHOLD = 60;
 
 let panelSyncLock = false;
+let currentEncodedScrollTarget = null;
 
 function getEncodedScrollContainer() {
     if (
@@ -20,7 +21,7 @@ function getEncodedScrollContainer() {
         return encodedMessages;
     }
 
-    if (typeof encodedPanel !== "undefined" && encodedPanel) {
+    if (typeof encodedPanel !== "undefined" && encodedPanel && encodedPanel.offsetParent !== null) {
         return encodedPanel;
     }
 
@@ -32,6 +33,7 @@ function getEncodedScrollContainer() {
 }
 
 function getDistanceFromBottom(container) {
+    if (!container) return 0;
     return container.scrollHeight - container.scrollTop - container.clientHeight;
 }
 
@@ -83,6 +85,8 @@ function syncFromEncoded() {
 function scrollAllToBottom(force = false) {
     const encoded = getEncodedScrollContainer();
     if (!decodedPanel) return;
+
+    bindEncodedScrollTarget();
 
     if (!force && userReadingOldMessages) return;
 
@@ -149,6 +153,8 @@ function afterConversationRender() {
     const currentCount = Array.isArray(state.messages) ? state.messages.length : 0;
     const newMessages = currentCount - lastRenderedMessagesCount;
 
+    bindEncodedScrollTarget();
+
     if (newMessages > 0) {
         if (shouldAutoFollow()) {
             scrollAllToBottom(true);
@@ -177,17 +183,25 @@ function afterConversationRender() {
 function bindEncodedScrollTarget() {
     const encoded = getEncodedScrollContainer();
     if (!encoded) return;
+
+    if (currentEncodedScrollTarget && currentEncodedScrollTarget !== encoded) {
+        currentEncodedScrollTarget.removeEventListener("scroll", handleEncodedScroll);
+        delete currentEncodedScrollTarget.dataset.scrollBound;
+    }
+
+    currentEncodedScrollTarget = encoded;
+
     if (encoded.dataset.scrollBound === "1") return;
 
     encoded.dataset.scrollBound = "1";
-    encoded.addEventListener("scroll", handleEncodedScroll);
+    encoded.addEventListener("scroll", handleEncodedScroll, { passive: true });
 }
 
 scrollToBottomBtn.addEventListener("click", function () {
     scrollAllToBottom(true);
 });
 
-decodedPanel.addEventListener("scroll", handleDecodedScroll);
+decodedPanel.addEventListener("scroll", handleDecodedScroll, { passive: true });
 
 bindEncodedScrollTarget();
 
