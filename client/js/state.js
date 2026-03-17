@@ -19,7 +19,6 @@ const state = {
     forwardMessage: null,
     forwardSelectedTarget: null,
     forwardSearchTerm: "",
-    
     isSwapped: false,
 
     bubbleAvatarCache: {}

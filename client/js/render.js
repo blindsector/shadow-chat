@@ -813,10 +813,16 @@ function renderConversation(forceScroll) {
     const lastOwnUnitId = findLastOwnRenderUnitId(units);
 
     units.forEach(function (unit, index) {
-        const prevUnit = index > 0 ? units[index - 1] : null;
+    const prevUnit = index > 0 ? units[index - 1] : null;
+
+    if (!state.isSwapped) {
         encodedMessages.appendChild(createEncodedBubble(unit, prevUnit));
         chatMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
-    });
+    } else {
+        encodedMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
+        chatMessages.appendChild(createEncodedBubble(unit, prevUnit));
+    }
+});
 
     renderLivePreview();
     renderEncodedOverlay();
@@ -888,55 +894,30 @@ function renderEncodedOverlay() {
         return;
     }
 
-    if (!state.isSwapped) {
-        if (!viewport.contains(encodedMessages)) {
-            viewport.appendChild(encodedMessages);
-        }
-    } else {
-        if (!viewport.contains(chatMessages)) {
-            viewport.appendChild(chatMessages);
-        }
+    if (!viewport.contains(encodedMessages)) {
+        viewport.appendChild(encodedMessages);
     }
 
     applyEncodedOverlayViewportLayout(viewport);
+
     overlay.classList.remove("hidden");
+
+    
 }
 
 function handleSwapChats() {
-    if (typeof state === "undefined") return;
+    if (!state) return;
 
     state.isSwapped = !state.isSwapped;
 
-    const overlayViewport = document.getElementById("encodedOverlayMessages");
-    const decodedPanelEl = typeof decodedPanel !== "undefined" ? decodedPanel : null;
+    // просто re-render
+    renderConversation(true);
+}
 
-    if (!overlayViewport || !decodedPanelEl) return;
+function handleSwapChats() {
+    if (!state) return;
 
-    if (!state.isSwapped) {
-        if (!overlayViewport.contains(encodedMessages)) {
-            overlayViewport.appendChild(encodedMessages);
-        }
+    state.isSwapped = !state.isSwapped;
 
-        if (!decodedPanelEl.contains(chatMessages)) {
-            decodedPanelEl.appendChild(chatMessages);
-        }
-    } else {
-        if (!overlayViewport.contains(chatMessages)) {
-            overlayViewport.appendChild(chatMessages);
-        }
-
-        if (!decodedPanelEl.contains(encodedMessages)) {
-            decodedPanelEl.appendChild(encodedMessages);
-        }
-    }
-
-    if (typeof bindEncodedScrollTarget === "function") {
-        bindEncodedScrollTarget();
-    }
-
-    if (typeof scrollAllToBottom === "function") {
-        requestAnimationFrame(function () {
-            scrollAllToBottom(true);
-        });
-    }
+    renderConversation(true);
 }

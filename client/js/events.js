@@ -646,15 +646,7 @@ function bindEvents() {
             positionComposerEmojiPicker();
         }
     }, true);
-        if (swapChatsBtn) {
-           swapChatsBtn.addEventListener("click", function (e) {
-           e.stopPropagation();
 
-        if (typeof handleSwapChats === "function") {
-            handleSwapChats();
-        }
-    });
-}
     bindEncodedOverlayTapMove();
     syncComposerToolsVisibility();
 }
