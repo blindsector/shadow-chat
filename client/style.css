@@ -1816,3 +1816,19 @@ body {
     transform: translateX(calc(-100% - 28px));
     opacity: 0.88;
 }
+
+.overlay-reveal-zone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 100vh;
+
+    /* невидимо */
+    background: transparent;
+    opacity: 0;
+
+    /* важно */
+    pointer-events: none;
+    z-index: 999;
+}

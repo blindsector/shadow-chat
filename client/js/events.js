@@ -210,6 +210,10 @@ function hideEncodedOverlayTemporarily() {
 
     state.overlayHidden = true;
     overlay.classList.add("overlay-hidden-left");
+
+    if (overlayRevealZone) {
+        overlayRevealZone.style.pointerEvents = "auto";
+    }
 }
 
 function showEncodedOverlayTemporarily() {
@@ -218,6 +222,10 @@ function showEncodedOverlayTemporarily() {
 
     state.overlayHidden = false;
     overlay.classList.remove("overlay-hidden-left");
+
+    if (overlayRevealZone) {
+        overlayRevealZone.style.pointerEvents = "none";
+    }
 }
 
 function startOverlayHideSwipe(e) {
@@ -267,14 +275,10 @@ function stopOverlayHideSwipe(e) {
 }
 
 function startOverlayRevealSwipe(e) {
-    const overlay = getEncodedOverlayElement();
-    if (!overlay) return;
+    const zone = overlayRevealZone;
+    if (!zone) return;
     if (!state.overlayHidden) return;
-
-    const edgeZone = Math.max(window.innerWidth - 80, 0);
-
-    // започва само от десния край
-    if (e.clientX < edgeZone) return;
+    if (!zone.contains(e.target)) return;
 
     overlayRevealSwipeState = {
         pointerId: typeof e.pointerId === "number" ? e.pointerId : null,

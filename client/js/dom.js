@@ -99,6 +99,7 @@ const emojiPicker = document.getElementById("emojiPicker");
 const encodedOverlay = document.getElementById("encodedOverlay");
 const encodedOverlayMessages = document.getElementById("encodedOverlayMessages");
 const swapChatsBtn = document.getElementById("swapChatsBtn");
+const overlayRevealZone = document.getElementById("overlayRevealZone");
 
 const hiddenCameraInput = document.createElement("input");
 hiddenCameraInput.type = "file";
