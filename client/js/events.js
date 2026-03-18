@@ -299,8 +299,8 @@ function handleOverlayRevealSwipeMove(e) {
         return;
     }
 
-    // swipe наляво (от десния край навътре)
-    if (dx <= -OVERLAY_REVEAL_SWIPE_THRESHOLD) {
+    // swipe надясно (от лявата зона навътре)
+    if (dx >= OVERLAY_REVEAL_SWIPE_THRESHOLD) {
         showEncodedOverlayTemporarily();
         overlayRevealSwipeState = null;
     }
