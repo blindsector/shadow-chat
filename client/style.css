@@ -1831,3 +1831,10 @@ body {
     touch-action: none;
     z-index: 2500;
 }
+
+@media (min-width: 901px) {
+    .overlay-reveal-zone {
+        left: 10px;
+        width: 90px;
+    }
+}
