@@ -201,7 +201,7 @@ let overlayHideSwipeState = null;
 let overlayRevealSwipeState = null;
 
 const OVERLAY_HIDE_SWIPE_THRESHOLD = 56;
-const OVERLAY_EDGE_REVEAL_ZONE = 22;
+const OVERLAY_EDGE_REVEAL_ZONE = 120;
 const OVERLAY_REVEAL_SWIPE_THRESHOLD = 56;
 
 function hideEncodedOverlayTemporarily() {
@@ -270,7 +270,10 @@ function startOverlayRevealSwipe(e) {
     const overlay = getEncodedOverlayElement();
     if (!overlay) return;
     if (!state.overlayHidden) return;
-    if (e.clientX > OVERLAY_EDGE_REVEAL_ZONE) return;
+
+    const revealZone = Math.min(window.innerWidth * 0.33, OVERLAY_EDGE_REVEAL_ZONE);
+
+    if (e.clientX > Math.min(window.innerWidth * 0.5, 180)) return;
 
     overlayRevealSwipeState = {
         pointerId: typeof e.pointerId === "number" ? e.pointerId : null,
