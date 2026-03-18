@@ -294,12 +294,10 @@ function handleOverlayRevealSwipeMove(e) {
     const dx = e.clientX - overlayRevealSwipeState.startX;
     const dy = e.clientY - overlayRevealSwipeState.startY;
 
-    // само хоризонтално
     if (Math.abs(dx) <= Math.abs(dy)) {
         return;
     }
 
-    // swipe надясно (от лявата зона навътре)
     if (dx >= OVERLAY_REVEAL_SWIPE_THRESHOLD) {
         showEncodedOverlayTemporarily();
         overlayRevealSwipeState = null;
@@ -324,7 +322,9 @@ function bindOverlayHideRevealGestures() {
     window.addEventListener("pointerup", stopOverlayHideSwipe, { passive: true });
     window.addEventListener("pointercancel", stopOverlayHideSwipe, { passive: true });
 
-    window.addEventListener("pointerdown", startOverlayRevealSwipe, { passive: true });
+    if (overlayRevealZone) {
+    overlayRevealZone.addEventListener("pointerdown", startOverlayRevealSwipe, { passive: true });
+}
     window.addEventListener("pointermove", handleOverlayRevealSwipeMove, { passive: true });
     window.addEventListener("pointerup", stopOverlayRevealSwipe, { passive: true });
     window.addEventListener("pointercancel", stopOverlayRevealSwipe, { passive: true });

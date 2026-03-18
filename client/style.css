@@ -1820,15 +1820,14 @@ body {
 .overlay-reveal-zone {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 36px;
-    height: 100vh;
+    left: 14px;
+    width: 56px;
+    height: 100dvh;
 
-    /* невидимо */
     background: transparent;
     opacity: 0;
 
-    /* важно */
     pointer-events: none;
-    z-index: 999;
+    touch-action: none;
+    z-index: 2500;
 }
