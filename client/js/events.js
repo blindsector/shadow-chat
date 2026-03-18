@@ -317,25 +317,14 @@ function bindOverlayHideRevealGestures() {
 
     overlay.dataset.hideRevealBound = "1";
 
-    // HIDE (от overlay-а)
     overlay.addEventListener("pointerdown", startOverlayHideSwipe, { passive: true });
     window.addEventListener("pointermove", handleOverlayHideSwipeMove, { passive: true });
     window.addEventListener("pointerup", stopOverlayHideSwipe, { passive: true });
     window.addEventListener("pointercancel", stopOverlayHideSwipe, { passive: true });
 
-    // REVEAL (от невидимата зона)
-    if (overlayRevealZone && overlayRevealZone.dataset.bound !== "1") {
-        overlayRevealZone.dataset.bound = "1";
-
-        overlayRevealZone.addEventListener("pointerdown", startOverlayRevealSwipe, { passive: true });
-
-        overlayRevealZone.addEventListener("click", function () {
-            if (state.overlayHidden) {
-                showEncodedOverlayTemporarily();
-            }
-        });
-    }
-
+    if (overlayRevealZone) {
+    overlayRevealZone.addEventListener("pointerdown", startOverlayRevealSwipe, { passive: true });
+}
     window.addEventListener("pointermove", handleOverlayRevealSwipeMove, { passive: true });
     window.addEventListener("pointerup", stopOverlayRevealSwipe, { passive: true });
     window.addEventListener("pointercancel", stopOverlayRevealSwipe, { passive: true });
