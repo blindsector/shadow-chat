@@ -271,9 +271,10 @@ function startOverlayRevealSwipe(e) {
     if (!overlay) return;
     if (!state.overlayHidden) return;
 
-    const revealZone = Math.min(window.innerWidth * 0.33, OVERLAY_EDGE_REVEAL_ZONE);
+    const edgeZone = Math.max(window.innerWidth - 80, 0);
 
-    if (e.clientX > Math.min(window.innerWidth * 0.5, 180)) return;
+    // започва само от десния край
+    if (e.clientX < edgeZone) return;
 
     overlayRevealSwipeState = {
         pointerId: typeof e.pointerId === "number" ? e.pointerId : null,
@@ -289,11 +290,13 @@ function handleOverlayRevealSwipeMove(e) {
     const dx = e.clientX - overlayRevealSwipeState.startX;
     const dy = e.clientY - overlayRevealSwipeState.startY;
 
+    // само хоризонтално
     if (Math.abs(dx) <= Math.abs(dy)) {
         return;
     }
 
-    if (dx >= OVERLAY_REVEAL_SWIPE_THRESHOLD) {
+    // swipe наляво (от десния край навътре)
+    if (dx <= -OVERLAY_REVEAL_SWIPE_THRESHOLD) {
         showEncodedOverlayTemporarily();
         overlayRevealSwipeState = null;
     }
