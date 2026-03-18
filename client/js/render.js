@@ -701,8 +701,16 @@ function syncOverlayVisibilityNow() {
 
     if (!isChatVisible) {
         overlay.classList.add("hidden");
+        overlay.classList.remove("overlay-hidden-left");
+        return;
+    }
+
+    overlay.classList.remove("hidden");
+
+    if (state.overlayHidden) {
+        overlay.classList.add("overlay-hidden-left");
     } else {
-        overlay.classList.remove("hidden");
+        overlay.classList.remove("overlay-hidden-left");
     }
 }
 

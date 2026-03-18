@@ -1803,3 +1803,16 @@ body {
 .swap-chats-btn:active {
     transform: translateX(-50%) scale(0.95);
 }
+
+.encoded-overlay {
+    transition:
+        transform 0.22s ease,
+        opacity 0.22s ease,
+        box-shadow 0.22s ease;
+    will-change: transform, opacity;
+}
+
+.encoded-overlay.overlay-hidden-left {
+    transform: translateX(calc(-100% - 28px));
+    opacity: 0.88;
+}

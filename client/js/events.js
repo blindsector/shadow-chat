@@ -197,6 +197,129 @@ let overlayHeaderTapTime = 0;
 const OVERLAY_DRAG_THRESHOLD = 8;
 const OVERLAY_DOUBLE_TAP_MS = 280;
 
+let overlayHideSwipeState = null;
+let overlayRevealSwipeState = null;
+
+const OVERLAY_HIDE_SWIPE_THRESHOLD = 56;
+const OVERLAY_EDGE_REVEAL_ZONE = 22;
+const OVERLAY_REVEAL_SWIPE_THRESHOLD = 56;
+
+function hideEncodedOverlayTemporarily() {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+
+    state.overlayHidden = true;
+    overlay.classList.add("overlay-hidden-left");
+}
+
+function showEncodedOverlayTemporarily() {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+
+    state.overlayHidden = false;
+    overlay.classList.remove("overlay-hidden-left");
+}
+
+function startOverlayHideSwipe(e) {
+    const overlay = getEncodedOverlayElement();
+    const header = getEncodedOverlayHeader();
+
+    if (!overlay || state.overlayHidden) return;
+    if (!overlay.contains(e.target)) return;
+    if (header && header.contains(e.target)) return;
+
+    overlayHideSwipeState = {
+        pointerId: typeof e.pointerId === "number" ? e.pointerId : null,
+        startX: e.clientX,
+        startY: e.clientY,
+        moved: false
+    };
+}
+
+function handleOverlayHideSwipeMove(e) {
+    if (!overlayHideSwipeState) return;
+    if (overlayHideSwipeState.pointerId !== null && e.pointerId !== overlayHideSwipeState.pointerId) return;
+
+    const dx = e.clientX - overlayHideSwipeState.startX;
+    const dy = e.clientY - overlayHideSwipeState.startY;
+
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+        return;
+    }
+
+    if (Math.abs(dx) <= Math.abs(dy)) {
+        return;
+    }
+
+    overlayHideSwipeState.moved = true;
+
+    if (dx <= -OVERLAY_HIDE_SWIPE_THRESHOLD) {
+        hideEncodedOverlayTemporarily();
+        overlayHideSwipeState = null;
+    }
+}
+
+function stopOverlayHideSwipe(e) {
+    if (!overlayHideSwipeState) return;
+    if (overlayHideSwipeState.pointerId !== null && e.pointerId !== overlayHideSwipeState.pointerId) return;
+
+    overlayHideSwipeState = null;
+}
+
+function startOverlayRevealSwipe(e) {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay) return;
+    if (!state.overlayHidden) return;
+    if (e.clientX > OVERLAY_EDGE_REVEAL_ZONE) return;
+
+    overlayRevealSwipeState = {
+        pointerId: typeof e.pointerId === "number" ? e.pointerId : null,
+        startX: e.clientX,
+        startY: e.clientY
+    };
+}
+
+function handleOverlayRevealSwipeMove(e) {
+    if (!overlayRevealSwipeState) return;
+    if (overlayRevealSwipeState.pointerId !== null && e.pointerId !== overlayRevealSwipeState.pointerId) return;
+
+    const dx = e.clientX - overlayRevealSwipeState.startX;
+    const dy = e.clientY - overlayRevealSwipeState.startY;
+
+    if (Math.abs(dx) <= Math.abs(dy)) {
+        return;
+    }
+
+    if (dx >= OVERLAY_REVEAL_SWIPE_THRESHOLD) {
+        showEncodedOverlayTemporarily();
+        overlayRevealSwipeState = null;
+    }
+}
+
+function stopOverlayRevealSwipe(e) {
+    if (!overlayRevealSwipeState) return;
+    if (overlayRevealSwipeState.pointerId !== null && e.pointerId !== overlayRevealSwipeState.pointerId) return;
+
+    overlayRevealSwipeState = null;
+}
+
+function bindOverlayHideRevealGestures() {
+    const overlay = getEncodedOverlayElement();
+    if (!overlay || overlay.dataset.hideRevealBound === "1") return;
+
+    overlay.dataset.hideRevealBound = "1";
+
+    overlay.addEventListener("pointerdown", startOverlayHideSwipe, { passive: true });
+    window.addEventListener("pointermove", handleOverlayHideSwipeMove, { passive: true });
+    window.addEventListener("pointerup", stopOverlayHideSwipe, { passive: true });
+    window.addEventListener("pointercancel", stopOverlayHideSwipe, { passive: true });
+
+    window.addEventListener("pointerdown", startOverlayRevealSwipe, { passive: true });
+    window.addEventListener("pointermove", handleOverlayRevealSwipeMove, { passive: true });
+    window.addEventListener("pointerup", stopOverlayRevealSwipe, { passive: true });
+    window.addEventListener("pointercancel", stopOverlayRevealSwipe, { passive: true });
+}
+
 function getEncodedOverlayElement() {
     return document.getElementById("encodedOverlay");
 }
@@ -658,5 +781,6 @@ function bindEvents() {
 }
 
 bindEncodedOverlayTapMove();
+bindOverlayHideRevealGestures();
 syncComposerToolsVisibility();
 }

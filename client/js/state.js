@@ -20,6 +20,7 @@ const state = {
     forwardSelectedTarget: null,
     forwardSearchTerm: "",
     isSwapped: false,
+    overlayHidden: false,
 
     bubbleAvatarCache: {}
 };
