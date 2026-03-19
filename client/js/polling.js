@@ -89,9 +89,9 @@ function startPolling() {
                 }
             }
 
-            await loadConversation(false);
+await loadConversation(false);
 
-// ===== TYPING CHECK =====
+// ===== TYPING CHECK (FIXED) =====
 if (state.activeChatType === "direct" && state.activeChatId) {
     try {
         const res = await apiRequest(
@@ -103,7 +103,11 @@ if (state.activeChatType === "direct" && state.activeChatId) {
 
         if (res && res.typing) {
             state.typingUsers[state.activeChatId] = Date.now() + 3000;
+        } else {
+            state.typingUsers[state.activeChatId] = 0;
         }
+
+        renderConversation(false);
     } catch (err) {}
 }
         }
