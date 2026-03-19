@@ -781,16 +781,72 @@ function bindEvents() {
     }, true);
 
     if (swapChatsBtn) {
-    swapChatsBtn.addEventListener("click", function (e) {
-        e.stopPropagation();
+        swapChatsBtn.addEventListener("click", function (e) {
+            e.stopPropagation();
 
-        if (typeof handleSwapChats === "function") {
-            handleSwapChats();
-        }
-    });
+            if (typeof handleSwapChats === "function") {
+                handleSwapChats();
+            }
+        });
+    }
+
+    if (panicUnlockBtn) {
+        panicUnlockBtn.addEventListener("click", function () {
+            deactivatePanicMode();
+        });
+    }
+
+    bindEncodedOverlayTapMove();
+    bindOverlayHideRevealGestures();
+    bindPanicTrigger();
+    syncComposerToolsVisibility();
 }
 
-bindEncodedOverlayTapMove();
-bindOverlayHideRevealGestures();
-syncComposerToolsVisibility();
+function activatePanicMode() {
+    state.panicMode = true;
+
+    if (panicOverlay) {
+        panicOverlay.classList.remove("hidden");
+    }
+
+    if (decodedPanel) {
+        decodedPanel.style.display = "none";
+    }
+}
+
+function deactivatePanicMode() {
+    state.panicMode = false;
+
+    if (panicOverlay) {
+        panicOverlay.classList.add("hidden");
+    }
+
+    if (decodedPanel) {
+        decodedPanel.style.display = "";
+    }
+}
+
+let panicTapCount = 0;
+let panicTapTimer = null;
+
+function bindPanicTrigger() {
+    const header = document.querySelector(".chat-header");
+    if (!header || header.dataset.panicBound === "1") return;
+
+    header.dataset.panicBound = "1";
+
+    header.addEventListener("click", function () {
+        panicTapCount++;
+
+        clearTimeout(panicTapTimer);
+
+        panicTapTimer = setTimeout(function () {
+            panicTapCount = 0;
+        }, 600);
+
+        if (panicTapCount >= 3) {
+            panicTapCount = 0;
+            activatePanicMode();
+        }
+    });
 }

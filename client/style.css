@@ -1831,3 +1831,33 @@ body {
     touch-action: none;
     z-index: 2500;
 }
+
+.panic-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panic-card {
+    text-align: center;
+}
+
+.panic-title {
+    color: white;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+#panicUnlockBtn {
+    padding: 12px 20px;
+    border-radius: 14px;
+    border: none;
+    background: #222;
+    color: white;
+    font-size: 15px;
+}

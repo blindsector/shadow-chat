@@ -21,6 +21,7 @@ const state = {
     forwardSearchTerm: "",
     isSwapped: false,
     overlayHidden: false,
+    panicMode: false,
 
     bubbleAvatarCache: {}
 };

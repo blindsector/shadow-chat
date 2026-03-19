@@ -101,6 +101,9 @@ const encodedOverlayMessages = document.getElementById("encodedOverlayMessages")
 const swapChatsBtn = document.getElementById("swapChatsBtn");
 const overlayRevealZone = document.getElementById("overlayRevealZone");
 
+const panicOverlay = document.getElementById("panicOverlay");
+const panicUnlockBtn = document.getElementById("panicUnlockBtn");
+
 const hiddenCameraInput = document.createElement("input");
 hiddenCameraInput.type = "file";
 hiddenCameraInput.accept = "image/*";
