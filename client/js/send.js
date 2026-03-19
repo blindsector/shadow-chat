@@ -57,6 +57,7 @@ async function sendMessage() {
 
         await loadConversation(true);
         await loadAllChatSources();
+        feedback.playSend();
 
         // keep keyboard active
         if (messageInput) {

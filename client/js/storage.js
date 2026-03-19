@@ -88,3 +88,22 @@ function saveNotificationsSetting(value, userId) {
         String(!!value)
     );
 }
+/* ========= SOUND STORAGE ========= */
+
+function getSoundStorageKey(userId) {
+    if (!userId) return "shadow_sound";
+    return "shadow_sound_" + String(userId);
+}
+
+function loadSoundSetting(userId) {
+    const val = localStorage.getItem(getSoundStorageKey(userId));
+    if (val === null) return true;
+    return val === "true";
+}
+
+function saveSoundSetting(value, userId) {
+    localStorage.setItem(
+        getSoundStorageKey(userId),
+        String(!!value)
+    );
+}
