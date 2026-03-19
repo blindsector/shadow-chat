@@ -790,11 +790,7 @@ function bindEvents() {
         });
     }
 
-    if (panicUnlockBtn) {
-        panicUnlockBtn.addEventListener("click", function () {
-            deactivatePanicMode();
-        });
-    }
+    
 
     bindEncodedOverlayTapMove();
     bindOverlayHideRevealGestures();
@@ -804,25 +800,37 @@ function bindEvents() {
 
 function activatePanicMode() {
     state.panicMode = true;
-
-    if (panicOverlay) {
-        panicOverlay.classList.remove("hidden");
-    }
-
-    if (decodedPanel) {
-        decodedPanel.style.display = "none";
-    }
-}
-
-function deactivatePanicMode() {
-    state.panicMode = false;
+    state.isSwapped = true;
+    state.overlayHidden = true;
 
     if (panicOverlay) {
         panicOverlay.classList.add("hidden");
     }
 
-    if (decodedPanel) {
-        decodedPanel.style.display = "";
+    renderConversation(true);
+}
+
+async function deactivatePanicMode() {
+    const password = prompt("Парола:");
+
+    if (!password) return;
+
+    try {
+        await apiRequest("/api/auth/login", "POST", {
+            username: state.user.username,
+            password: password
+        });
+
+        state.panicMode = false;
+        state.overlayHidden = false;
+
+        if (panicOverlay) {
+            panicOverlay.classList.add("hidden");
+        }
+
+        renderConversation(true);
+    } catch (error) {
+        alert("Грешна парола");
     }
 }
 
@@ -846,7 +854,12 @@ function bindPanicTrigger() {
 
         if (panicTapCount >= 3) {
             panicTapCount = 0;
-            activatePanicMode();
+
+            if (state.panicMode) {
+                deactivatePanicMode();
+            } else {
+                activatePanicMode();
+            }
         }
     });
 }

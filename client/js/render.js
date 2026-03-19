@@ -842,10 +842,12 @@ function renderConversation(forceScroll) {
     const units = buildRenderUnits(state.messages);
     const lastOwnUnitId = findLastOwnRenderUnitId(units);
 
+    const forceEncodedAsMain = state.panicMode === true ? true : state.isSwapped;
+
     units.forEach(function (unit, index) {
     const prevUnit = index > 0 ? units[index - 1] : null;
 
-    if (!state.isSwapped) {
+    if (!forceEncodedAsMain) {
         encodedMessages.appendChild(createEncodedBubble(unit, prevUnit));
         chatMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
     } else {
@@ -931,15 +933,23 @@ function renderEncodedOverlay() {
         return;
     }
 
+    if (state.panicMode) {
+        overlay.classList.add("hidden");
+        return;
+    }
+
+    if (state.overlayHidden) {
+        overlay.classList.add("overlay-hidden-left");
+    } else {
+        overlay.classList.remove("overlay-hidden-left");
+    }
+
     if (!viewport.contains(encodedMessages)) {
         viewport.appendChild(encodedMessages);
     }
 
     applyEncodedOverlayViewportLayout(viewport);
-
     overlay.classList.remove("hidden");
-
-    
 }
 
 function handleSwapChats() {
