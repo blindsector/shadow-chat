@@ -865,8 +865,32 @@ function renderLivePreview() {
 
     renderLivePreview();
     renderEncodedOverlay();
+    if (state.panicMode) {
+    if (encodedPanel) {
+        encodedPanel.style.display = "none";
+    }
+
     if (decodedPanel) {
-    decodedPanel.style.display = state.panicMode ? "none" : "";
+        decodedPanel.style.display = "";
+    }
+
+    const titleRow = document.querySelector(".panel-title-row");
+    if (titleRow) {
+        titleRow.style.display = "none";
+    }
+} else {
+    if (encodedPanel) {
+        encodedPanel.style.display = "";
+    }
+
+    if (decodedPanel) {
+        decodedPanel.style.display = "";
+    }
+
+    const titleRow = document.querySelector(".panel-title-row");
+    if (titleRow) {
+        titleRow.style.display = "";
+    }
 }
 
     state.lastConversationRenderSignature = nextConversationSignature;
