@@ -39,14 +39,26 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE IF NOT EXISTS group_reads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            invite_code TEXT NOT NULL UNIQUE,
-            created_at TEXT NOT NULL
+            user_id INTEGER NOT NULL,
+            group_id INTEGER NOT NULL,
+            last_read_at TEXT,
+            UNIQUE(user_id, group_id)
         )
     """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS typing_status (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            contact_id INTEGER NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(user_id, contact_id)
+        )
+    """)
+
+    # user presence
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS sessions (
