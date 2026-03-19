@@ -22,6 +22,7 @@ const state = {
     isSwapped: false,
     overlayHidden: false,
     panicMode: false,
+    unlockPassword: "",
 
     bubbleAvatarCache: {}
 };

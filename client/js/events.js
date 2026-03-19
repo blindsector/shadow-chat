@@ -803,10 +803,6 @@ function activatePanicMode() {
     state.isSwapped = true;
     state.overlayHidden = true;
 
-    if (panicOverlay) {
-        panicOverlay.classList.add("hidden");
-    }
-
     renderConversation(true);
 }
 
@@ -815,23 +811,15 @@ async function deactivatePanicMode() {
 
     if (!password) return;
 
-    try {
-        await apiRequest("/api/auth/login", "POST", {
-            username: state.user.username,
-            password: password
-        });
-
-        state.panicMode = false;
-        state.overlayHidden = false;
-
-        if (panicOverlay) {
-            panicOverlay.classList.add("hidden");
-        }
-
-        renderConversation(true);
-    } catch (error) {
+    if (!state.unlockPassword || password !== state.unlockPassword) {
         alert("Грешна парола");
+        return;
     }
+
+    state.panicMode = false;
+    state.overlayHidden = false;
+
+    renderConversation(true);
 }
 
 let panicTapCount = 0;

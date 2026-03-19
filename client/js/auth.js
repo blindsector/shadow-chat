@@ -31,6 +31,7 @@ async function login() {
 
         setToken(data.token);
         state.user = data.user;
+        state.unlockPassword = password;
 
         receiptsToggle.checked = state.receiptsEnabled;
 
@@ -71,6 +72,7 @@ async function register() {
 
         setToken(data.token);
         state.user = data.user;
+        state.unlockPassword = password;
 
         receiptsToggle.checked = state.receiptsEnabled;
 

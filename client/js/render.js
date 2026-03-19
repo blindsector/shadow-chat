@@ -553,8 +553,9 @@ function createDecodedBubble(unit, prevUnit, lastOwnUnitId) {
     const receiptMeta = createReceiptMeta(item, isMe, isLastOwnMessage);
 
     if (receiptMeta) {
-    if (!state.isSwapped) {
-        // нормално → decoded е main
+    const forceEncodedAsMain = state.panicMode === true ? true : state.isSwapped;
+
+    if (!forceEncodedAsMain) {
         stack.appendChild(receiptMeta);
     }
 }
@@ -621,8 +622,9 @@ function createEncodedBubble(unit, prevUnit) {
     const receiptMeta = createReceiptMeta(item, isMe, isLastOwnMessage);
 
     if (receiptMeta) {
-    if (state.isSwapped) {
-        // при swap → encoded става main
+    const forceEncodedAsMain = state.panicMode === true ? true : state.isSwapped;
+
+    if (forceEncodedAsMain) {
         stack.appendChild(receiptMeta);
     }
 }
@@ -745,6 +747,8 @@ function renderLivePreview() {
         return;
     }
 
+    const forceEncodedAsMain = state.panicMode === true ? true : state.isSwapped;
+
     const encodedStack = document.createElement("div");
     encodedStack.className = "message-stack stack-me";
     encodedStack.dataset.preview = "1";
@@ -776,10 +780,14 @@ function renderLivePreview() {
 
     encodedStack.appendChild(encShell);
 
-    if (!state.isSwapped) {
+    if (!forceEncodedAsMain) {
         encodedMessages.appendChild(encodedStack);
     } else {
         chatMessages.appendChild(encodedStack);
+    }
+
+    if (state.panicMode) {
+        return;
     }
 
     if (hasPendingAttachment) {
@@ -810,14 +818,13 @@ function renderLivePreview() {
 
         decodedStack.appendChild(decShell);
 
-        if (!state.isSwapped) {
+        if (!forceEncodedAsMain) {
             chatMessages.appendChild(decodedStack);
         } else {
             encodedMessages.appendChild(decodedStack);
         }
     }
-}
-function renderConversation(forceScroll) {
+}function renderConversation(forceScroll) {
     if (typeof forceScroll === "undefined") {
         forceScroll = false;
     }
@@ -858,6 +865,9 @@ function renderConversation(forceScroll) {
 
     renderLivePreview();
     renderEncodedOverlay();
+    if (decodedPanel) {
+    decodedPanel.style.display = state.panicMode ? "none" : "";
+}
 
     state.lastConversationRenderSignature = nextConversationSignature;
     state.lastLivePreviewSignature = nextPreviewSignature;
