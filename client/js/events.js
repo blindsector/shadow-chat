@@ -807,6 +807,13 @@ function activatePanicMode() {
 }
 
 async function deactivatePanicMode() {
+
+    // ако сме на телефон → първо биометрия
+    if (window.AndroidBridge && AndroidBridge.triggerBiometric) {
+        AndroidBridge.triggerBiometric();
+        return;
+    }
+
     const password = prompt("Парола:");
 
     if (!password) return;
@@ -851,3 +858,25 @@ function bindPanicTrigger() {
         }
     });
 }
+
+// ===== ANDROID BRIDGE =====
+
+window.__panicTriggerFromNative = function () {
+    activatePanicMode();
+
+    if (window.AndroidBridge && AndroidBridge.triggerVibration) {
+        AndroidBridge.triggerVibration();
+    }
+};
+
+window.__panicUnlockFromNative = function () {
+    state.panicMode = false;
+    state.overlayHidden = false;
+
+    renderConversation(true);
+};
+
+window.__panicBiometricFailed = function () {
+    // fallback към парола
+    deactivatePanicMode();
+};
