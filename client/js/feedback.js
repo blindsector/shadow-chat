@@ -9,32 +9,38 @@ const feedback = {
         this.sounds.receive = this.createSound(660, 0.08);
     },
 
-    createSound(freq, duration) {
-        return function () {
-            if (!feedback.enabled) return;
+createSound(freq, duration) {
+    return function () {
+        if (!feedback.enabled) return;
 
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-                osc.type = "sine";
-                osc.frequency.value = freq;
+            // FIX: unlock audio
+            if (ctx.state === "suspended") {
+                ctx.resume();
+            }
 
-                gain.gain.value = 0.05;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
 
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+            osc.type = "sine";
+            osc.frequency.value = freq;
 
-                osc.start();
+            gain.gain.value = 0.06;
 
-                setTimeout(() => {
-                    osc.stop();
-                    ctx.close();
-                }, duration * 1000);
-            } catch (e) {}
-        };
-    },
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+
+            setTimeout(() => {
+                osc.stop();
+                ctx.close();
+            }, duration * 1000);
+        } catch (e) {}
+    };
+},
 
     playSend() {
         this.sounds.send && this.sounds.send();
