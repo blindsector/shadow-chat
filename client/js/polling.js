@@ -58,6 +58,7 @@ function startPolling() {
         if (!state.user) return;
 
         await loadAllChatSources();
+        checkForNewMessagesAndNotify();
 
         if (chatRoomScreen.classList.contains("active") && state.activeChatType && state.activeChatId) {
             if (state.activeChatType === "direct" && state.receiptsEnabled) {
@@ -194,4 +195,47 @@ function stopPresenceHeartbeat() {
         clearInterval(state.presenceTimer);
         state.presenceTimer = null;
     }
+}
+
+let lastNotificationSignature = "";
+
+function checkForNewMessagesAndNotify() {
+    if (!state.chatItems || !state.chatItems.length) {
+        return;
+    }
+
+    const latest = state.chatItems[0];
+    if (!latest) {
+        return;
+    }
+
+    const signature =
+        String(latest.last_message_id || "") +
+        "_" +
+        String(latest.updated_at || "") +
+        "_" +
+        String(latest.last_message_preview || "");
+
+    if (!lastNotificationSignature) {
+        lastNotificationSignature = signature;
+        return;
+    }
+
+    if (signature === lastNotificationSignature) {
+        return;
+    }
+
+    lastNotificationSignature = signature;
+
+    if (
+        state.activeChatType === latest.type &&
+        String(state.activeChatId) === String(latest.id)
+    ) {
+        return;
+    }
+
+    showNotification(
+        latest.name || "Ново съобщение",
+        latest.last_message_preview || "Имаш ново съобщение"
+    );
 }

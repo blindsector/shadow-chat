@@ -23,6 +23,7 @@ const state = {
     overlayHidden: false,
     panicMode: false,
     unlockPassword: "",
+    notificationsEnabled: true,
 
     bubbleAvatarCache: {}
 };

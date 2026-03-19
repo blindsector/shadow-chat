@@ -68,3 +68,23 @@ function loadOnlineVisibilitySetting(userId) {
 function saveOnlineVisibilitySetting(value, userId) {
     localStorage.setItem(getOnlineVisibilityStorageKey(userId), String(!!value));
 }
+
+/* ========= NOTIFICATIONS STORAGE ========= */
+
+function getNotificationsStorageKey(userId) {
+    if (!userId) return "shadow_notifications";
+    return "shadow_notifications_" + String(userId);
+}
+
+function loadNotificationsSetting(userId) {
+    const val = localStorage.getItem(getNotificationsStorageKey(userId));
+    if (val === null) return true; // по default включени
+    return val === "true";
+}
+
+function saveNotificationsSetting(value, userId) {
+    localStorage.setItem(
+        getNotificationsStorageKey(userId),
+        String(!!value)
+    );
+}

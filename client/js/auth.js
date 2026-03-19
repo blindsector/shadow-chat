@@ -35,6 +35,9 @@ async function login() {
 
         receiptsToggle.checked = state.receiptsEnabled;
 
+        state.notificationsEnabled = loadNotificationsSetting(state.user.id);
+        notificationsToggle.checked = state.notificationsEnabled;
+
         renderMyHeader();
         showApp();
         showChatListScreen();
@@ -76,6 +79,9 @@ async function register() {
 
         receiptsToggle.checked = state.receiptsEnabled;
 
+        state.notificationsEnabled = loadNotificationsSetting(state.user.id);
+        notificationsToggle.checked = state.notificationsEnabled;
+
         renderMyHeader();
         showApp();
         showChatListScreen();
@@ -109,6 +115,9 @@ async function bootstrapSession() {
         const data = await apiRequest("/api/auth/me", "GET", null, true);
         state.user = data.user;
         receiptsToggle.checked = state.receiptsEnabled;
+
+        state.notificationsEnabled = loadNotificationsSetting(state.user.id);
+        notificationsToggle.checked = state.notificationsEnabled;
 
         renderMyHeader();
         showApp();

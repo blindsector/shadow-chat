@@ -604,7 +604,13 @@ function bindEvents() {
             }
         });
     }
-
+    
+    if (typeof notificationsToggle !== "undefined" && notificationsToggle) {
+        notificationsToggle.addEventListener("change", function () {
+            state.notificationsEnabled = notificationsToggle.checked;
+            saveNotificationsSetting(state.notificationsEnabled, state.user.id);
+        });
+    }
     contactSearchInput.addEventListener("input", renderChatList);
     addContactBtn.addEventListener("click", addContact);
 
@@ -880,3 +886,26 @@ window.__panicBiometricFailed = function () {
     // fallback към парола
     deactivatePanicMode();
 };
+
+function showNotification(title, body) {
+    if (!state.notificationsEnabled) return;
+
+    if (!("Notification" in window)) return;
+
+    if (Notification.permission === "granted") {
+        new Notification(title, {
+            body: body || "Ново съобщение"
+        });
+        return;
+    }
+
+    if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(function (permission) {
+            if (permission === "granted") {
+                new Notification(title, {
+                    body: body || "Ново съобщение"
+                });
+            }
+        });
+    }
+}
