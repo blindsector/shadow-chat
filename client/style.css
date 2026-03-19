@@ -1861,3 +1861,42 @@ body {
     color: white;
     font-size: 15px;
 }
+
+/* ===== typing indicator ===== */
+
+.message-stack[data-typing="1"] {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    animation: typingBubbleLiftIn 180ms ease-out;
+}
+
+.message-stack[data-typing="1"] .bubble-shell {
+    align-items: flex-start;
+}
+
+.message-stack[data-typing="1"] .bubble {
+    padding: 6px 10px;
+    border-radius: 14px;
+    min-height: 0;
+    max-width: 84px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
+}
+
+.message-stack[data-typing="1"] .message-text {
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.1px;
+    font-style: italic;
+    opacity: 0.78;
+}
+
+@keyframes typingBubbleLiftIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
