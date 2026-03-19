@@ -804,39 +804,39 @@ function renderLivePreview() {
         return;
     }
 
-    if (hasPendingAttachment || raw) {
-        const decodedStack = document.createElement("div");
-        decodedStack.className = "message-stack stack-me";
-        decodedStack.dataset.preview = "1";
+    const decodedStack = document.createElement("div");
+    decodedStack.className = "message-stack stack-me";
+    decodedStack.dataset.preview = "1";
 
-        const decodedPreview = document.createElement("div");
-        decodedPreview.className = "bubble me preview-bubble";
-        decodedPreview.dataset.preview = "1";
+    const decodedPreview = document.createElement("div");
+    decodedPreview.className = "bubble me preview-bubble";
+    decodedPreview.dataset.preview = "1";
 
+    if (hasPendingAttachment) {
         const pendingItem = createPendingAttachmentPreviewItem();
         if (pendingItem) {
             decodedPreview.appendChild(makeFileCard(pendingItem));
         }
+    }
 
-        if (raw) {
-            const msg = document.createElement("div");
-            msg.className = "message-text";
-            msg.textContent = raw;
-            msg.style.marginTop = hasPendingAttachment ? "10px" : "0";
-            decodedPreview.appendChild(msg);
-        }
+    if (raw) {
+        const msg = document.createElement("div");
+        msg.className = "message-text";
+        msg.textContent = raw;
+        msg.style.marginTop = hasPendingAttachment ? "10px" : "0";
+        decodedPreview.appendChild(msg);
+    }
 
-        const decShell = document.createElement("div");
-        decShell.className = "bubble-shell decoded-shell preview-shell";
-        decShell.appendChild(decodedPreview);
+    const decShell = document.createElement("div");
+    decShell.className = "bubble-shell decoded-shell preview-shell";
+    decShell.appendChild(decodedPreview);
 
-        decodedStack.appendChild(decShell);
+    decodedStack.appendChild(decShell);
 
-        if (!forceEncodedAsMain) {
-            chatMessages.appendChild(decodedStack);
-        } else {
-            encodedMessages.appendChild(decodedStack);
-        }
+    if (!forceEncodedAsMain) {
+        chatMessages.appendChild(decodedStack);
+    } else {
+        encodedMessages.appendChild(decodedStack);
     }
 }
 
@@ -973,126 +973,7 @@ function renderConversation(forceScroll) {
     });
 }
 
-    const typingUntil =
-        state &&
-        state.typingUsers &&
-        state.activeChatId != null
-            ? Number(state.typingUsers[state.activeChatId] || 0)
-            : 0;
-
-    const typingActive =
-        state.activeChatType === "direct" &&
-        state.panicMode !== true &&
-        typingUntil > Date.now();
-
-    if (typingActive) {
-        const typingStack = document.createElement("div");
-        typingStack.className = "message-stack stack-him";
-        typingStack.dataset.typing = "1";
-
-        const typingBubble = document.createElement("div");
-        typingBubble.className = "bubble him";
-        typingBubble.style.opacity = "0.82";
-
-        const typingText = document.createElement("div");
-        typingText.className = "message-text";
-        typingText.textContent = "пише...";
-        typingText.style.fontStyle = "italic";
-
-        typingBubble.appendChild(typingText);
-
-        const typingShell = document.createElement("div");
-        typingShell.className = "bubble-shell decoded-shell";
-        typingShell.appendChild(typingBubble);
-
-        typingStack.appendChild(typingShell);
-
-        if (!forceEncodedAsMain) {
-            chatMessages.appendChild(typingStack);
-        } else {
-            encodedMessages.appendChild(typingStack);
-        }
-    }
-
-    renderLivePreview();
-    renderEncodedOverlay();
-
-    if (state.panicMode) {
-        if (encodedPanel) {
-            encodedPanel.style.display = "none";
-        }
-
-        if (decodedPanel) {
-            decodedPanel.style.display = "";
-        }
-
-        const titleRow = document.querySelector(".panel-title-row");
-        if (titleRow) {
-            titleRow.style.display = "none";
-        }
-    } else {
-        if (encodedPanel) {
-            encodedPanel.style.display = "";
-        }
-
-        if (decodedPanel) {
-            decodedPanel.style.display = "";
-        }
-
-        const titleRow = document.querySelector(".panel-title-row");
-        if (titleRow) {
-            titleRow.style.display = "";
-        }
-    }
-
-    state.lastConversationRenderSignature = nextConversationSignature;
-    state.lastLivePreviewSignature = nextPreviewSignature;
-
-    requestAnimationFrame(function () {
-        restoreAudioPlaybackState(audioState);
-
-        if (forceScroll) {
-            scrollAllToBottom(true);
-        } else {
-            afterConversationRender();
-        }
-
-        requestAnimationFrame(function () {
-            if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
-                scrollAllToBottom(true);
-            }
-        });
-
-        maybeKeepEncodedPreviewPinnedToBottom(forceScroll);
-        syncOverlayVisibilityNow();
-    });
-}
-
-    state.lastConversationRenderSignature = nextConversationSignature;
-    state.lastLivePreviewSignature = nextPreviewSignature;
-
-    requestAnimationFrame(function () {
-    restoreAudioPlaybackState(audioState);
-
-    if (forceScroll) {
-        scrollAllToBottom(true);
-    } else {
-        afterConversationRender();
-    }
-
-    // 🔥 FIX за preview + image scroll
-    requestAnimationFrame(function () {
-        if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
-            scrollAllToBottom(true);
-        }
-    });
-
-        maybeKeepEncodedPreviewPinnedToBottom(forceScroll);
-        syncOverlayVisibilityNow();
-   });
-}
-
-    function getOverlayElements() {
+function getOverlayElements() {
     return {
         overlay: document.getElementById("encodedOverlay"),
         messages: document.getElementById("encodedOverlayMessages")
@@ -1165,7 +1046,5 @@ function handleSwapChats() {
     if (!state) return;
 
     state.isSwapped = !state.isSwapped;
-
-    // просто re-render
     renderConversation(true);
 }
