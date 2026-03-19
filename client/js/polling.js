@@ -90,6 +90,22 @@ function startPolling() {
             }
 
             await loadConversation(false);
+
+// ===== TYPING CHECK =====
+if (state.activeChatType === "direct" && state.activeChatId) {
+    try {
+        const res = await apiRequest(
+            "/api/messages/typing?contact_id=" + state.activeChatId,
+            "GET",
+            null,
+            true
+        );
+
+        if (res && res.typing) {
+            state.typingUsers[state.activeChatId] = Date.now() + 3000;
+        }
+    } catch (err) {}
+}
         }
     }, 2000);
 

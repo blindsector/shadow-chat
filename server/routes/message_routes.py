@@ -8,7 +8,9 @@ from server.controllers.message_controller import (
     hide_message,
     delete_message,
     mark_direct_read,
-    forward_message
+    forward_message,
+    typing_ping,
+    get_typing
 )
 
 message_bp = Blueprint("message", __name__)
@@ -23,5 +25,9 @@ message_bp.route("/hide", methods=["POST"])(hide_message)
 message_bp.route("/delete", methods=["POST"])(delete_message)
 message_bp.route("/read", methods=["POST"])(mark_direct_read)
 
-# forward message
+# forward
 message_bp.route("/forward", methods=["POST"])(forward_message)
+
+# typing
+message_bp.route("/typing", methods=["POST"])(typing_ping)
+message_bp.route("/typing", methods=["GET"])(get_typing)

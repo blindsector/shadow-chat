@@ -770,3 +770,67 @@ def forward_message():
     conn.close()
 
     return jsonify({"ok": True})
+
+def typing_ping():
+    user = require_auth()
+    data = request.get_json() or {}
+
+    contact_id = data.get("contact_id")
+
+    if not contact_id:
+        return jsonify({"ok": False}), 400
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT OR REPLACE INTO typing_status
+        (user_id, contact_id, updated_at)
+        VALUES (?, ?, ?)
+    """, (
+        user["id"],
+        contact_id,
+        now_iso()
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"ok": True})
+
+
+def get_typing():
+    user = require_auth()
+    contact_id = request.args.get("contact_id", type=int)
+
+    if not contact_id:
+        return jsonify({"ok": False}), 400
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    row = cur.execute("""
+        SELECT updated_at
+        FROM typing_status
+        WHERE user_id = ?
+          AND contact_id = ?
+    """, (
+        contact_id,
+        user["id"]
+    )).fetchone()
+
+    conn.close()
+
+    if not row:
+        return jsonify({"ok": True, "typing": False})
+
+    from datetime import datetime, timedelta
+
+    try:
+        updated = datetime.fromisoformat(row["updated_at"])
+        if datetime.utcnow() - updated < timedelta(seconds=3):
+            return jsonify({"ok": True, "typing": True})
+    except Exception:
+        pass
+
+    return jsonify({"ok": True, "typing": False})

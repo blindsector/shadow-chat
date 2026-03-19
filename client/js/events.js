@@ -719,20 +719,31 @@ function bindEvents() {
         }
     });
 
-    messageInput.addEventListener("input", function () {
-        this.style.height = "28px";
-        this.style.height = Math.min(this.scrollHeight, 110) + "px";
+messageInput.addEventListener("input", function () {
+    this.style.height = "28px";
+    this.style.height = Math.min(this.scrollHeight, 110) + "px";
 
-        syncComposerToolsVisibility();
-        renderConversation(false);
+    syncComposerToolsVisibility();
+    renderConversation(false);
 
-        if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
-            scrollAllToBottom(true);
-        } else if (typeof updateScrollButton === "function") {
-            updateScrollButton();
-        }
-    });
+    if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
+        scrollAllToBottom(true);
+    } else if (typeof updateScrollButton === "function") {
+        updateScrollButton();
+    }
 
+    // ===== TYPING PING =====
+    if (state.activeChatType === "direct" && state.activeChatId) {
+        apiRequest(
+            "/api/messages/typing",
+            "POST",
+            {
+                contact_id: state.activeChatId
+            },
+            true
+        ).catch(() => {});
+    }
+});
     messageInput.addEventListener("focus", function () {
         syncComposerToolsVisibility();
     });

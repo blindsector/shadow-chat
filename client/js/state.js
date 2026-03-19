@@ -25,5 +25,6 @@ const state = {
     unlockPassword: "",
     notificationsEnabled: true,
 
+    typingUsers: {},
     bubbleAvatarCache: {}
 };

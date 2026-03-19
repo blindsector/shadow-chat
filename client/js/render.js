@@ -388,10 +388,23 @@ function buildConversationRenderSignature(messages) {
         ].join("|");
     }).join("||");
 
+    const typingUntil =
+        state &&
+        state.typingUsers &&
+        state.activeChatId != null
+            ? Number(state.typingUsers[state.activeChatId] || 0)
+            : 0;
+
+    const typingActive =
+        state.activeChatType === "direct" &&
+        state.panicMode !== true &&
+        typingUntil > Date.now();
+
     return [
         state.activeChatType || "",
         state.activeChatId || "",
         state.receiptsEnabled ? "1" : "0",
+        typingActive ? "1" : "0",
         base
     ].join("###");
 }
@@ -824,7 +837,9 @@ function renderLivePreview() {
             encodedMessages.appendChild(decodedStack);
         }
     }
-}function renderConversation(forceScroll) {
+}
+
+function renderConversation(forceScroll) {
     if (typeof forceScroll === "undefined") {
         forceScroll = false;
     }
@@ -852,45 +867,110 @@ function renderLivePreview() {
     const forceEncodedAsMain = state.panicMode === true ? true : state.isSwapped;
 
     units.forEach(function (unit, index) {
-    const prevUnit = index > 0 ? units[index - 1] : null;
+        const prevUnit = index > 0 ? units[index - 1] : null;
 
-    if (!forceEncodedAsMain) {
-        encodedMessages.appendChild(createEncodedBubble(unit, prevUnit));
-        chatMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
-    } else {
-        encodedMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
-        chatMessages.appendChild(createEncodedBubble(unit, prevUnit));
+        if (!forceEncodedAsMain) {
+            encodedMessages.appendChild(createEncodedBubble(unit, prevUnit));
+            chatMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
+        } else {
+            encodedMessages.appendChild(createDecodedBubble(unit, prevUnit, lastOwnUnitId));
+            chatMessages.appendChild(createEncodedBubble(unit, prevUnit));
+        }
+    });
+
+    const typingUntil =
+        state &&
+        state.typingUsers &&
+        state.activeChatId != null
+            ? Number(state.typingUsers[state.activeChatId] || 0)
+            : 0;
+
+    const typingActive =
+        state.activeChatType === "direct" &&
+        state.panicMode !== true &&
+        typingUntil > Date.now();
+
+    if (typingActive) {
+        const typingStack = document.createElement("div");
+        typingStack.className = "message-stack stack-him";
+        typingStack.dataset.typing = "1";
+
+        const typingBubble = document.createElement("div");
+        typingBubble.className = "bubble him";
+        typingBubble.style.opacity = "0.82";
+
+        const typingText = document.createElement("div");
+        typingText.className = "message-text";
+        typingText.textContent = "пише...";
+        typingText.style.fontStyle = "italic";
+
+        typingBubble.appendChild(typingText);
+
+        const typingShell = document.createElement("div");
+        typingShell.className = "bubble-shell decoded-shell";
+        typingShell.appendChild(typingBubble);
+
+        typingStack.appendChild(typingShell);
+
+        if (!forceEncodedAsMain) {
+            chatMessages.appendChild(typingStack);
+        } else {
+            encodedMessages.appendChild(typingStack);
+        }
     }
-});
 
     renderLivePreview();
     renderEncodedOverlay();
+
     if (state.panicMode) {
-    if (encodedPanel) {
-        encodedPanel.style.display = "none";
+        if (encodedPanel) {
+            encodedPanel.style.display = "none";
+        }
+
+        if (decodedPanel) {
+            decodedPanel.style.display = "";
+        }
+
+        const titleRow = document.querySelector(".panel-title-row");
+        if (titleRow) {
+            titleRow.style.display = "none";
+        }
+    } else {
+        if (encodedPanel) {
+            encodedPanel.style.display = "";
+        }
+
+        if (decodedPanel) {
+            decodedPanel.style.display = "";
+        }
+
+        const titleRow = document.querySelector(".panel-title-row");
+        if (titleRow) {
+            titleRow.style.display = "";
+        }
     }
 
-    if (decodedPanel) {
-        decodedPanel.style.display = "";
-    }
+    state.lastConversationRenderSignature = nextConversationSignature;
+    state.lastLivePreviewSignature = nextPreviewSignature;
 
-    const titleRow = document.querySelector(".panel-title-row");
-    if (titleRow) {
-        titleRow.style.display = "none";
-    }
-} else {
-    if (encodedPanel) {
-        encodedPanel.style.display = "";
-    }
+    requestAnimationFrame(function () {
+        restoreAudioPlaybackState(audioState);
 
-    if (decodedPanel) {
-        decodedPanel.style.display = "";
-    }
+        if (forceScroll) {
+            scrollAllToBottom(true);
+        } else {
+            afterConversationRender();
+        }
 
-    const titleRow = document.querySelector(".panel-title-row");
-    if (titleRow) {
-        titleRow.style.display = "";
-    }
+        requestAnimationFrame(function () {
+            if (typeof shouldAutoFollow === "function" && shouldAutoFollow()) {
+                scrollAllToBottom(true);
+            }
+        });
+
+        maybeKeepEncodedPreviewPinnedToBottom(forceScroll);
+        syncOverlayVisibilityNow();
+    });
 }
 
     state.lastConversationRenderSignature = nextConversationSignature;
