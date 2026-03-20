@@ -84,17 +84,18 @@ const feedback = {
     },
 
     vibrate(ms) {
-        if (!this.enabled) return;
+    if (!this.enabled) return;
 
-        try {
-            if (window.AndroidBridge && typeof AndroidBridge.triggerVibration === "function") {
-                AndroidBridge.triggerVibration();
-                return;
-            }
+    try {
+        // ANDROID BRIDGE
+        if (window.AndroidBridge && typeof AndroidBridge.triggerVibration === "function") {
+            AndroidBridge.triggerVibration();
+        }
 
-            if (navigator.vibrate) {
-                navigator.vibrate(ms);
-            }
-        } catch (e) {}
-    }
+        // FORCE fallback (работи и в WebView)
+        if (navigator.vibrate) {
+            navigator.vibrate(ms);
+        }
+    } catch (e) {}
+}
 };

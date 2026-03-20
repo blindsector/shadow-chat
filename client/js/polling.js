@@ -256,9 +256,11 @@ function checkForNewMessagesAndNotify() {
         state.activeChatType === latest.type &&
         String(state.activeChatId) === String(latest.id);
 
+    setTimeout(() => {
     if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
         feedback.playReceive();
     }
+}, 0);
 
     if (isActiveChat) {
         return;
