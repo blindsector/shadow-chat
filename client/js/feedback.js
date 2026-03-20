@@ -89,7 +89,9 @@ const feedback = {
     try {
         // ANDROID BRIDGE
         if (window.AndroidBridge && typeof AndroidBridge.triggerVibration === "function") {
-            AndroidBridge.triggerVibration();
+            try {
+    AndroidBridge.triggerVibration();
+} catch (e) {}
         }
 
         // FORCE fallback (работи и в WebView)
