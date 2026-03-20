@@ -245,12 +245,22 @@ function checkForNewMessagesAndNotify() {
         return;
     }
 
+    const previousSignature = lastNotificationSignature;
     lastNotificationSignature = signature;
 
-    if (
+    if (!previousSignature) {
+        return;
+    }
+
+    const isActiveChat =
         state.activeChatType === latest.type &&
-        String(state.activeChatId) === String(latest.id)
-    ) {
+        String(state.activeChatId) === String(latest.id);
+
+    if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
+        feedback.playReceive();
+    }
+
+    if (isActiveChat) {
         return;
     }
 
@@ -258,7 +268,4 @@ function checkForNewMessagesAndNotify() {
         latest.name || "Ново съобщение",
         latest.last_message_preview || "Имаш ново съобщение"
     );
-if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
-    feedback.playReceive();
-    }
 }
