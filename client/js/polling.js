@@ -245,29 +245,26 @@ function checkForNewMessagesAndNotify() {
         return;
     }
 
-    const previousSignature = lastNotificationSignature;
     lastNotificationSignature = signature;
-
-    if (!previousSignature) {
-        return;
-    }
 
     const isActiveChat =
         state.activeChatType === latest.type &&
         String(state.activeChatId) === String(latest.id);
 
-    setTimeout(() => {
-    if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
-        feedback.playReceive();
-    }
-}, 0);
-
     if (isActiveChat) {
         return;
     }
 
-    showNotification(
-        latest.name || "Ново съобщение",
-        latest.last_message_preview || "Имаш ново съобщение"
-    );
+    const title = latest.name || "Ново съобщение";
+    const body = latest.last_message_preview || "Имаш ново съобщение";
+
+    if (
+        window.AndroidBridge &&
+        typeof AndroidBridge.triggerNativeNotification === "function"
+    ) {
+        AndroidBridge.triggerNativeNotification(title, body);
+        return;
+    }
+
+    showNotification(title, body);
 }
