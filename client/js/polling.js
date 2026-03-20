@@ -247,16 +247,29 @@ function checkForNewMessagesAndNotify() {
 
     lastNotificationSignature = signature;
 
-    const isActiveChat =
+    const isChatScreenVisible =
+        chatRoomScreen &&
+        chatRoomScreen.classList.contains("active") &&
+        !document.hidden;
+
+    const isSameChatAsLatest =
         state.activeChatType === latest.type &&
         String(state.activeChatId) === String(latest.id);
 
-    if (isActiveChat) {
+    const shouldSuppressAlert =
+        isChatScreenVisible &&
+        isSameChatAsLatest;
+
+    if (shouldSuppressAlert) {
         return;
     }
 
     const title = latest.name || "Ново съобщение";
     const body = latest.last_message_preview || "Имаш ново съобщение";
+
+    if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
+        feedback.playReceive();
+    }
 
     if (
         window.AndroidBridge &&
