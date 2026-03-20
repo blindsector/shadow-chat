@@ -258,5 +258,7 @@ function checkForNewMessagesAndNotify() {
         latest.name || "Ново съобщение",
         latest.last_message_preview || "Имаш ново съобщение"
     );
-feedback.playReceive();
+if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
+    feedback.playReceive();
+    }
 }

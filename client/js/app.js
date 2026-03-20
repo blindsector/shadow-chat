@@ -7,13 +7,11 @@ function startApp() {
         onlineVisibilityToggle.checked = state.onlineVisibilityEnabled;
     }
 
-    bootstrapSession();
+    if (typeof feedback !== "undefined" && feedback && typeof feedback.init === "function") {
+        feedback.init();
+    }
 
-    setTimeout(() => {
-        if (state.user && typeof feedback !== "undefined") {
-            feedback.init();
-        }
-    }, 500);
+    bootstrapSession();
 }
 
 startApp();
