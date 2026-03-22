@@ -8,6 +8,7 @@ from server.services.db import (
     UPLOAD_DIR
 )
 from server.services.session import require_auth
+from server.services.push import send_push_to_user
 
 
 ALLOWED_REACTION_EMOJIS = {"👍", "❤️", "😂", "😮", "😢", "👎"}
@@ -173,6 +174,20 @@ def send_message():
 
     conn.commit()
     conn.close()
+
+    try:
+        sender_name = user.get("username") or "Shadow Chat"
+    except Exception:
+        sender_name = "Shadow Chat"
+
+    try:
+        send_push_to_user(
+            int(receiver_id),
+            sender_name,
+            "Имаш ново съобщение"
+        )
+    except Exception:
+        pass
 
     return jsonify({"ok": True})
 
