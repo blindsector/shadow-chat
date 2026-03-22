@@ -990,8 +990,28 @@ function showNotification(title, body) {
 window.__openChatFromPush = function (chatId) {
     if (!chatId) return;
 
-    const item = state.chatItems.find(c => String(c.id) === String(chatId));
-    if (!item) return;
+    let attempts = 0;
+    const maxAttempts = 12;
 
-    openChat(item.type, item.id);
+    const tryOpen = function () {
+        attempts++;
+
+        const items = Array.isArray(state.chatItems) ? state.chatItems : [];
+        const item = items.find(function (c) {
+            return String(c.id) === String(chatId);
+        });
+
+        if (item) {
+            openChat(item.type, item.id);
+            return;
+        }
+
+        if (attempts >= maxAttempts) {
+            return;
+        }
+
+        setTimeout(tryOpen, 500);
+    };
+
+    tryOpen();
 };
