@@ -7,7 +7,8 @@ from server.services.db import get_connection
 
 FIREBASE_APP = None
 
-SERVICE_ACCOUNT_PATH = os.path.join(
+SECRET_FILE_PATH = "/etc/secrets/firebase-service-account.json"
+LOCAL_FILE_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "firebase-service-account.json"
 )
@@ -22,18 +23,28 @@ def _get_firebase_app():
     try:
         firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
 
-        if not firebase_json:
-            print("❌ FIREBASE_CREDENTIALS_JSON missing")
-            return None
+        if firebase_json:
+            import json
+            cred_dict = json.loads(firebase_json)
+            cred = credentials.Certificate(cred_dict)
+            FIREBASE_APP = firebase_admin.initialize_app(cred)
+            print("✅ Firebase initialized (ENV)")
+            return FIREBASE_APP
 
-        import json
-        cred_dict = json.loads(firebase_json)
+        if os.path.exists(SECRET_FILE_PATH):
+            cred = credentials.Certificate(SECRET_FILE_PATH)
+            FIREBASE_APP = firebase_admin.initialize_app(cred)
+            print("✅ Firebase initialized (SECRET FILE)")
+            return FIREBASE_APP
 
-        cred = credentials.Certificate(cred_dict)
-        FIREBASE_APP = firebase_admin.initialize_app(cred)
+        if os.path.exists(LOCAL_FILE_PATH):
+            cred = credentials.Certificate(LOCAL_FILE_PATH)
+            FIREBASE_APP = firebase_admin.initialize_app(cred)
+            print("✅ Firebase initialized (LOCAL FILE)")
+            return FIREBASE_APP
 
-        print("✅ Firebase initialized (ENV)")
-        return FIREBASE_APP
+        print("❌ No Firebase credentials found")
+        return None
 
     except Exception as e:
         print("❌ Firebase init error:", str(e))
