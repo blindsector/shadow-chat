@@ -986,3 +986,12 @@ function showNotification(title, body) {
         });
     }
 }
+
+window.__openChatFromPush = function (chatId) {
+    if (!chatId) return;
+
+    const item = state.chatItems.find(c => String(c.id) === String(chatId));
+    if (!item) return;
+
+    openChat(item.type, item.id);
+};
