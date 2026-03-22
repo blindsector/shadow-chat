@@ -1900,3 +1900,13 @@ body {
         transform: translateY(0);
     }
 }
+
+#settingsModal .menu-item {
+    border-radius: 12px;
+    margin-bottom: 6px;
+    background: rgba(255,255,255,0.04);
+}
+
+#settingsModal .menu-item span {
+    font-size: 14px;
+}

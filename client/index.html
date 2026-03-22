@@ -49,6 +49,7 @@
 
                 <div class="menu-item action-item" id="openInviteModalBtn">Покани приятел</div>
                 <div class="menu-item action-item" id="createGroupBtn">Създай група</div>
+                <div class="menu-item action-item" id="openSettingsBtn">⚙️ Settings</div>
 
                 <label class="menu-item toggle-row">
                     <span>Покажи receipt статуси</span>
@@ -280,10 +281,80 @@
     </div>
 </div>
 
+<div id="settingsModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-title">⚙️ Settings</div>
+
+    <div class="menu-item toggle-row">
+      <span>Push Notifications</span>
+      <input type="checkbox" id="settingsNotificationsToggle">
+    </div>
+
+    <div class="menu-item toggle-row">
+      <span>Sound</span>
+      <input type="checkbox" id="settingsSoundToggle">
+    </div>
+
+    <div class="menu-item toggle-row">
+      <span>Vibration</span>
+      <input type="checkbox" id="settingsVibrationToggle">
+    </div>
+
+    <div class="menu-item toggle-row">
+      <span>Read Receipts</span>
+      <input type="checkbox" id="settingsReceiptsToggle">
+    </div>
+
+    <div class="menu-item toggle-row">
+      <span>Online Status</span>
+      <input type="checkbox" id="settingsOnlineToggle">
+    </div>
+
+    <div class="modal-actions">
+      <button id="closeSettingsBtn" class="modal-btn">Close</button>
+    </div>
+  </div>
+</div>
+
 <div id="imageViewer" class="image-viewer hidden">
     <div class="image-viewer-inner">
         <button id="closeImageViewerBtn" class="image-viewer-close">✕</button>
         <img id="imageViewerImg" src="" alt="preview">
+    </div>
+</div>
+
+<div id="settingsModal" class="modal hidden">
+    <div class="modal-card">
+        <div class="modal-title">⚙️ Settings</div>
+
+        <label class="menu-item toggle-row">
+            <span>Push Notifications</span>
+            <input type="checkbox" id="settingsNotificationsToggle">
+        </label>
+
+        <label class="menu-item toggle-row">
+            <span>Sound</span>
+            <input type="checkbox" id="settingsSoundToggle">
+        </label>
+
+        <label class="menu-item toggle-row">
+            <span>Vibration</span>
+            <input type="checkbox" id="settingsVibrationToggle">
+        </label>
+
+        <label class="menu-item toggle-row">
+            <span>Read Receipts</span>
+            <input type="checkbox" id="settingsReceiptsToggle">
+        </label>
+
+        <label class="menu-item toggle-row">
+            <span>Online Status</span>
+            <input type="checkbox" id="settingsOnlineToggle">
+        </label>
+
+        <div class="modal-actions">
+            <button id="closeSettingsBtn" class="secondary-btn modal-btn">Затвори</button>
+        </div>
     </div>
 </div>
 

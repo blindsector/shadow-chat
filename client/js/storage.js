@@ -107,3 +107,23 @@ function saveSoundSetting(value, userId) {
         String(!!value)
     );
 }
+
+/* ========= VIBRATION STORAGE ========= */
+
+function getVibrationStorageKey(userId) {
+    if (!userId) return "shadow_vibration";
+    return "shadow_vibration_" + String(userId);
+}
+
+function loadVibrationSetting(userId) {
+    const val = localStorage.getItem(getVibrationStorageKey(userId));
+    if (val === null) return true;
+    return val === "true";
+}
+
+function saveVibrationSetting(value, userId) {
+    localStorage.setItem(
+        getVibrationStorageKey(userId),
+        String(!!value)
+    );
+}

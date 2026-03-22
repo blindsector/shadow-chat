@@ -1,5 +1,7 @@
 const feedback = {
     enabled: true,
+    soundEnabled: true,
+    vibrationEnabled: true,
     audioUnlocked: false,
     audioContext: null,
 
@@ -49,7 +51,7 @@ const feedback = {
     },
 
     beep(freq, durationMs, volume) {
-        if (!this.enabled) return;
+        if (!this.enabled || !this.soundEnabled) return;
 
         const ctx = this.ensureAudioContext();
         if (!ctx) return;
@@ -84,7 +86,7 @@ const feedback = {
     },
 
     vibrate(ms) {
-    if (!this.enabled) return;
+    if (!this.enabled || !this.vibrationEnabled) return;
 
     try {
         // ANDROID BRIDGE

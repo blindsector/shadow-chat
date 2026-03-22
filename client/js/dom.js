@@ -20,6 +20,7 @@ const avatarFileInput = document.getElementById("avatarFileInput");
 const openInviteModalBtn = document.getElementById("openInviteModalBtn");
 const createGroupBtn = document.getElementById("createGroupBtn");
 const receiptsToggle = document.getElementById("receiptsToggle");
+const openSettingsBtn = document.getElementById("openSettingsBtn");
 const onlineVisibilityToggle = document.getElementById("onlineVisibilityToggle");
 const logoutBtn = document.getElementById("logoutBtn");
 
@@ -101,7 +102,14 @@ const encodedOverlayMessages = document.getElementById("encodedOverlayMessages")
 const swapChatsBtn = document.getElementById("swapChatsBtn");
 const overlayRevealZone = document.getElementById("overlayRevealZone");
 
+const settingsModal = document.getElementById("settingsModal");
+const closeSettingsBtn = document.getElementById("closeSettingsBtn");
 
+const settingsNotificationsToggle = document.getElementById("settingsNotificationsToggle");
+const settingsSoundToggle = document.getElementById("settingsSoundToggle");
+const settingsVibrationToggle = document.getElementById("settingsVibrationToggle");
+const settingsReceiptsToggle = document.getElementById("settingsReceiptsToggle");
+const settingsOnlineToggle = document.getElementById("settingsOnlineToggle");
 
 const hiddenCameraInput = document.createElement("input");
 hiddenCameraInput.type = "file";

@@ -532,7 +532,22 @@ function bindEvents() {
             openInviteModal();
         });
     }
+    if (openSettingsBtn) {
+    openSettingsBtn.addEventListener("click", () => {
+        closeMenu();
+        settingsModal.classList.remove("hidden");
 
+        const userId = state.user?.id;
+
+        settingsNotificationsToggle.checked = loadNotificationsSetting(userId);
+        feedback.soundEnabled = loadSoundSetting(userId);
+        feedback.vibrationEnabled = loadVibrationSetting(userId);
+        settingsSoundToggle.checked = loadSoundSetting(userId);
+        settingsVibrationToggle.checked = loadVibrationSetting(userId);
+        settingsReceiptsToggle.checked = loadReceiptsSetting(userId);
+        settingsOnlineToggle.checked = loadOnlineVisibilitySetting(userId);
+    });
+}
     if (myInviteCodeLabel) {
         myInviteCodeLabel.addEventListener("click", () => {
             openInviteModal();
@@ -554,6 +569,12 @@ function bindEvents() {
     if (closeInviteBtn) {
         closeInviteBtn.addEventListener("click", closeInviteModal);
     }
+
+    if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener("click", () => {
+        settingsModal.classList.add("hidden");
+    });
+}
 
     if (inviteModal) {
         inviteModal.addEventListener("click", function (e) {
@@ -584,6 +605,51 @@ function bindEvents() {
         saveReceiptsSetting(state.receiptsEnabled);
         renderConversation(false);
     });
+
+    settingsNotificationsToggle.addEventListener("change", function () {
+    state.notificationsEnabled = this.checked;
+    saveNotificationsSetting(this.checked, state.user?.id);
+});
+
+settingsSoundToggle.addEventListener("change", function () {
+    saveSoundSetting(this.checked, state.user?.id);
+
+    if (typeof feedback !== "undefined" && feedback) {
+        feedback.soundEnabled = this.checked;
+    }
+});
+
+settingsVibrationToggle.addEventListener("change", function () {
+    saveVibrationSetting(this.checked, state.user?.id);
+
+    if (typeof feedback !== "undefined" && feedback) {
+        feedback.vibrationEnabled = this.checked;
+    }
+});
+
+settingsReceiptsToggle.addEventListener("change", function () {
+    state.receiptsEnabled = this.checked;
+    saveReceiptsSetting(this.checked, state.user?.id);
+    renderConversation(false);
+});
+
+settingsOnlineToggle.addEventListener("change", async function () {
+    state.onlineVisibilityEnabled = this.checked;
+    saveOnlineVisibilitySetting(this.checked, state.user?.id);
+
+    try {
+        await apiRequest(
+            "/api/users/presence/visibility",
+            "POST",
+            {
+                show_online_status: state.onlineVisibilityEnabled
+            },
+            true
+        );
+    } catch (err) {
+        console.warn("presence visibility update failed", err);
+    }
+});
 
     if (typeof onlineVisibilityToggle !== "undefined" && onlineVisibilityToggle) {
         onlineVisibilityToggle.addEventListener("change", async function () {

@@ -256,25 +256,34 @@ function checkForNewMessagesAndNotify() {
         state.activeChatType === latest.type &&
         String(state.activeChatId) === String(latest.id);
 
-    const shouldSuppressAlert =
+    const isSameChatOpenNow =
         isChatScreenVisible &&
         isSameChatAsLatest;
-
-    if (shouldSuppressAlert) {
-        return;
-    }
 
     const title = latest.name || "Ново съобщение";
     const body = latest.last_message_preview || "Имаш ново съобщение";
 
-    if (typeof feedback !== "undefined" && feedback && typeof feedback.playReceive === "function") {
+    if (isSameChatOpenNow) {
+        return;
+    }
+
+    const shouldUseNativePush =
+        !!window.AndroidBridge &&
+        typeof AndroidBridge.triggerNativeNotification === "function";
+
+    const shouldPlayLocalReceiveFeedback =
+        !document.hidden && !shouldUseNativePush;
+
+    if (
+        shouldPlayLocalReceiveFeedback &&
+        typeof feedback !== "undefined" &&
+        feedback &&
+        typeof feedback.playReceive === "function"
+    ) {
         feedback.playReceive();
     }
 
-    if (
-        window.AndroidBridge &&
-        typeof AndroidBridge.triggerNativeNotification === "function"
-    ) {
+    if (shouldUseNativePush) {
         AndroidBridge.triggerNativeNotification(title, body);
         return;
     }
