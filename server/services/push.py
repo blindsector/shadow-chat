@@ -19,17 +19,22 @@ def _get_firebase_app():
     if FIREBASE_APP is not None:
         return FIREBASE_APP
 
-    print("🔍 Checking Firebase service account path:", SERVICE_ACCOUNT_PATH)
-
-    if not os.path.exists(SERVICE_ACCOUNT_PATH):
-        print("❌ Firebase service account NOT FOUND")
-        return None
-
     try:
-        cred = credentials.Certificate(SERVICE_ACCOUNT_PATH)
+        firebase_json = os.getenv("FIREBASE_CREDENTIALS_JSON")
+
+        if not firebase_json:
+            print("❌ FIREBASE_CREDENTIALS_JSON missing")
+            return None
+
+        import json
+        cred_dict = json.loads(firebase_json)
+
+        cred = credentials.Certificate(cred_dict)
         FIREBASE_APP = firebase_admin.initialize_app(cred)
-        print("✅ Firebase initialized")
+
+        print("✅ Firebase initialized (ENV)")
         return FIREBASE_APP
+
     except Exception as e:
         print("❌ Firebase init error:", str(e))
         return None
