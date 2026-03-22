@@ -317,3 +317,41 @@ def get_contact_presence(contact_id):
         },
         "presence": _build_presence_payload(contact)
     }), 200
+def register_device_token():
+    current_user = _get_current_user()
+
+    if not current_user:
+        return jsonify({
+            "ok": False,
+            "message": "Unauthorized."
+        }), 401
+
+    data = request.get_json(silent=True) or {}
+    token = (data.get("token") or "").strip()
+
+    if not token:
+        return jsonify({
+            "ok": False,
+            "message": "Token is required."
+        }), 400
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # махаме стари записи със същия token
+    cursor.execute("""
+        DELETE FROM device_tokens
+        WHERE token = ?
+    """, (token,))
+
+    cursor.execute("""
+        INSERT INTO device_tokens (user_id, token, created_at)
+        VALUES (?, ?, ?)
+    """, (current_user["id"], token, now_iso()))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "ok": True
+    }), 200
