@@ -876,9 +876,15 @@ messageInput.addEventListener("input", function () {
     
 
     bindEncodedOverlayTapMove();
-    bindOverlayHideRevealGestures();
-    bindPanicTrigger();
-    syncComposerToolsVisibility();
+bindOverlayHideRevealGestures();
+bindPanicTrigger();
+syncComposerToolsVisibility();
+
+setTimeout(function () {
+    if (typeof window.__consumePendingPushChat === "function") {
+        window.__consumePendingPushChat();
+    }
+}, 1200);
 }
 
 function activatePanicMode() {
@@ -987,21 +993,28 @@ function showNotification(title, body) {
     }
 }
 
-window.__openChatFromPush = function (chatType, chatId) {
-    if (!chatId) return;
+window.__openChatFromPush = async function (chatType, chatId) {
+    const normalizedType = String(chatType || "direct");
+    const normalizedId = String(chatId || "");
+
+    if (!normalizedId) return;
 
     let attempts = 0;
-    const maxAttempts = 14;
+    const maxAttempts = 20;
 
     const tryOpen = async function () {
         attempts++;
 
+        if (!state.user) {
+            if (attempts < maxAttempts) {
+                setTimeout(tryOpen, 700);
+            }
+            return;
+        }
+
         try {
             await loadAllChatSources();
         } catch (e) {}
-
-        const normalizedType = String(chatType || "direct");
-        const normalizedId = String(chatId);
 
         const items = Array.isArray(state.chatItems) ? state.chatItems : [];
         const item = items.find(function (c) {
@@ -1009,16 +1022,32 @@ window.__openChatFromPush = function (chatType, chatId) {
         });
 
         if (item) {
+            try {
+                localStorage.removeItem("shadow_pending_push_chat");
+            } catch (e) {}
             openChat(item.type, item.id);
             return;
         }
 
-        if (attempts >= maxAttempts) {
-            return;
+        if (attempts < maxAttempts) {
+            setTimeout(tryOpen, 700);
         }
-
-        setTimeout(tryOpen, 500);
     };
 
     tryOpen();
+};
+
+window.__consumePendingPushChat = function () {
+    try {
+        const raw = localStorage.getItem("shadow_pending_push_chat");
+        if (!raw) return;
+
+        const data = JSON.parse(raw);
+        if (!data || !data.chat_id) return;
+
+        window.__openChatFromPush(
+            data.chat_type || "direct",
+            data.chat_id
+        );
+    } catch (e) {}
 };
