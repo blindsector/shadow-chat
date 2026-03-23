@@ -16,15 +16,6 @@ async function startApp() {
     } catch (e) {
         console.warn("bootstrapSession failed", e);
     }
-
-    setTimeout(function () {
-        if (
-            typeof window.__consumePendingPushChat === "function" &&
-            localStorage.getItem("shadow_pending_push_chat")
-        ) {
-            window.__consumePendingPushChat();
-        }
-    }, 250);
 }
 
 startApp();

@@ -40,15 +40,22 @@ async function login() {
 
         renderMyHeader();
         showApp();
-        showChatListScreen();
 
         const paired = await processPendingInviteAfterAuth();
 
         await loadAllChatSources();
         startPolling();
 
-        if (paired) {
-            renderChatList();
+        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+
+        if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
+            window.__consumePendingPushChat();
+        } else {
+            showChatListScreen();
+
+            if (paired) {
+                renderChatList();
+            }
         }
 
         showLoginStatus("");
@@ -84,15 +91,22 @@ async function register() {
 
         renderMyHeader();
         showApp();
-        showChatListScreen();
 
         const paired = await processPendingInviteAfterAuth();
 
         await loadAllChatSources();
         startPolling();
 
-        if (paired) {
-            renderChatList();
+        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+
+        if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
+            window.__consumePendingPushChat();
+        } else {
+            showChatListScreen();
+
+            if (paired) {
+                renderChatList();
+            }
         }
 
         showLoginStatus("");
@@ -121,15 +135,22 @@ async function bootstrapSession() {
 
         renderMyHeader();
         showApp();
-        showChatListScreen();
 
         const paired = await processPendingInviteAfterAuth();
 
         await loadAllChatSources();
         startPolling();
 
-        if (paired) {
-            renderChatList();
+        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+
+        if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
+            window.__consumePendingPushChat();
+        } else {
+            showChatListScreen();
+
+            if (paired) {
+                renderChatList();
+            }
         }
     } catch (error) {
         clearToken();
