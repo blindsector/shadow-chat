@@ -989,35 +989,30 @@ function showNotification(title, body) {
 }
 
 window.__openChatFromPush = async function (chatType, chatId) {
-    const normalizedType = String(chatType || "direct");
-    const normalizedId = String(chatId || "");
-
-    if (!normalizedId) {
+    const id = String(chatId || "");
+    if (!id) {
         state.pendingPushOpen = false;
-        try {
-            localStorage.removeItem("shadow_pending_push_chat");
-        } catch (e) {}
         return;
     }
 
-    let attempts = 0;
-    const maxAttempts = 20;
-
-    const clearPendingPush = function () {
+    const clearPending = function () {
         state.pendingPushOpen = false;
         try {
             localStorage.removeItem("shadow_pending_push_chat");
         } catch (e) {}
     };
 
+    let attempts = 0;
+    const maxAttempts = 20;
+
     const tryOpen = async function () {
         attempts++;
 
         if (!state.user) {
             if (attempts < maxAttempts) {
-                setTimeout(tryOpen, 700);
+                setTimeout(tryOpen, 500);
             } else {
-                clearPendingPush();
+                clearPending();
             }
             return;
         }
@@ -1028,26 +1023,30 @@ window.__openChatFromPush = async function (chatType, chatId) {
 
         const items = Array.isArray(state.chatItems) ? state.chatItems : [];
 
-        const exactItem = items.find(function (c) {
-            return String(c.id) === normalizedId && String(c.type) === normalizedType;
-        });
+        const item = items.find(c => String(c.id) === id);
 
-        const fallbackItem = exactItem || items.find(function (c) {
-            return String(c.id) === normalizedId;
-        });
+        if (item) {
+            // 🔥 КРИТИЧНО
+            state.activeChatId = String(item.id);
+            state.activeChatType = String(item.type);
 
-        if (fallbackItem) {
-            clearPendingPush();
-            openChat(fallbackItem.type, fallbackItem.id);
+            saveActiveChat(item.id, item.type);
+
+            showChatRoomScreen();
+            renderChatHeader(item);
+
+            await loadConversation(true);
+
+            clearPending();
             return;
         }
 
         if (attempts < maxAttempts) {
-            setTimeout(tryOpen, 700);
+            setTimeout(tryOpen, 500);
             return;
         }
 
-        clearPendingPush();
+        clearPending();
     };
 
     tryOpen();
