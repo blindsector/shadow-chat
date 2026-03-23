@@ -880,15 +880,6 @@ bindOverlayHideRevealGestures();
 bindPanicTrigger();
 syncComposerToolsVisibility();
 
-setTimeout(function () {
-    if (
-        typeof window.__consumePendingPushChat === "function" &&
-        localStorage.getItem("shadow_pending_push_chat")
-    ) {
-        window.__consumePendingPushChat();
-    }
-}, 2500);
-
 }
 
 function activatePanicMode() {

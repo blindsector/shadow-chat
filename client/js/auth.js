@@ -63,7 +63,6 @@ async function login() {
         showLoginStatus(error.message, true);
     }
 }
-
 async function register() {
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
@@ -114,7 +113,6 @@ async function register() {
         showLoginStatus(error.message, true);
     }
 }
-
 async function bootstrapSession() {
     hydratePendingInviteFromUrl();
 
@@ -157,7 +155,6 @@ async function bootstrapSession() {
         showLogin();
     }
 }
-
 function logout() {
     stopPolling();
     clearToken();

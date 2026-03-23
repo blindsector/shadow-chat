@@ -291,9 +291,14 @@ function checkForNewMessagesAndNotify() {
     }
 
     if (shouldUseNativePush) {
-        AndroidBridge.triggerNativeNotification(title, body);
-        return;
-    }
+    AndroidBridge.triggerNativeNotification(
+        title,
+        body,
+        String(latest.id || ""),
+        String(latest.type || "direct")
+    );
+    return;
+}
 
     showNotification(title, body);
 }
