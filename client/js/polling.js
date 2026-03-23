@@ -60,7 +60,12 @@ function startPolling() {
         await loadAllChatSources();
         checkForNewMessagesAndNotify();
 
-        if (chatRoomScreen.classList.contains("active") && state.activeChatType && state.activeChatId) {
+        if (
+    chatRoomScreen.classList.contains("active") &&
+    state.activeChatType &&
+    state.activeChatId &&
+    !state.pendingPushOpen
+) {
             if (state.activeChatType === "direct" && state.receiptsEnabled) {
                 try {
                     await apiRequest(

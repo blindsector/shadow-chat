@@ -887,6 +887,15 @@ setTimeout(function () {
 }, 1200);
 }
 
+setTimeout(function () {
+    if (
+        typeof window.__consumePendingPushChat === "function" &&
+        localStorage.getItem("shadow_pending_push_chat")
+    ) {
+        window.__consumePendingPushChat();
+    }
+}, 2500);
+
 function activatePanicMode() {
     state.panicMode = true;
     state.isSwapped = true;
@@ -1014,6 +1023,12 @@ window.__openChatFromPush = async function (chatType, chatId) {
 
         try {
             await loadAllChatSources();
+        if (!state.chatItems || !state.chatItems.length) {
+    if (attempts < maxAttempts) {
+        setTimeout(tryOpen, 700);
+    }
+    return;
+}
         } catch (e) {}
 
         const items = Array.isArray(state.chatItems) ? state.chatItems : [];
@@ -1026,6 +1041,7 @@ window.__openChatFromPush = async function (chatType, chatId) {
                 localStorage.removeItem("shadow_pending_push_chat");
             } catch (e) {}
             openChat(item.type, item.id);
+            state.pendingPushOpen = false;
             return;
         }
 
@@ -1044,6 +1060,8 @@ window.__consumePendingPushChat = function () {
 
         const data = JSON.parse(raw);
         if (!data || !data.chat_id) return;
+
+        state.pendingPushOpen = true;
 
         window.__openChatFromPush(
             data.chat_type || "direct",
