@@ -61,8 +61,10 @@ function startPolling() {
         checkForNewMessagesAndNotify();
 
        const hasPendingPushTarget = !!state.pendingPushOpen || !!localStorage.getItem("shadow_pending_push_chat");
+const isAppVisible = !document.hidden;
 
 if (
+    isAppVisible &&
     chatRoomScreen.classList.contains("active") &&
     state.activeChatType &&
     state.activeChatId &&

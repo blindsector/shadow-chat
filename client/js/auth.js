@@ -39,14 +39,22 @@ async function login() {
         notificationsToggle.checked = state.notificationsEnabled;
 
         renderMyHeader();
-        showApp();
 
-        const paired = await processPendingInviteAfterAuth();
+const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
 
-        await loadAllChatSources();
-        startPolling();
+if (hasPendingPushChat) {
+    loginScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+    chatListScreen.classList.remove("active");
+    chatRoomScreen.classList.remove("active");
+} else {
+    showApp();
+}
 
-        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+const paired = await processPendingInviteAfterAuth();
+
+await loadAllChatSources();
+startPolling();
 
         if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
             window.__consumePendingPushChat();
@@ -89,14 +97,22 @@ async function register() {
         notificationsToggle.checked = state.notificationsEnabled;
 
         renderMyHeader();
-        showApp();
 
-        const paired = await processPendingInviteAfterAuth();
+const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
 
-        await loadAllChatSources();
-        startPolling();
+if (hasPendingPushChat) {
+    loginScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+    chatListScreen.classList.remove("active");
+    chatRoomScreen.classList.remove("active");
+} else {
+    showApp();
+}
 
-        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+const paired = await processPendingInviteAfterAuth();
+
+await loadAllChatSources();
+startPolling();
 
         if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
             window.__consumePendingPushChat();
@@ -129,17 +145,25 @@ async function bootstrapSession() {
         receiptsToggle.checked = state.receiptsEnabled;
 
         state.notificationsEnabled = loadNotificationsSetting(state.user.id);
-        notificationsToggle.checked = state.notificationsEnabled;
+notificationsToggle.checked = state.notificationsEnabled;
 
-        renderMyHeader();
-        showApp();
+renderMyHeader();
 
-        const paired = await processPendingInviteAfterAuth();
+const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
 
-        await loadAllChatSources();
-        startPolling();
+if (hasPendingPushChat) {
+    loginScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+    chatListScreen.classList.remove("active");
+    chatRoomScreen.classList.remove("active");
+} else {
+    showApp();
+}
 
-        const hasPendingPushChat = !!localStorage.getItem("shadow_pending_push_chat");
+const paired = await processPendingInviteAfterAuth();
+
+await loadAllChatSources();
+startPolling();
 
         if (hasPendingPushChat && typeof window.__consumePendingPushChat === "function") {
             window.__consumePendingPushChat();
