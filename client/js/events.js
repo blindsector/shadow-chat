@@ -992,10 +992,23 @@ window.__openChatFromPush = async function (chatType, chatId) {
     const normalizedType = String(chatType || "direct");
     const normalizedId = String(chatId || "");
 
-    if (!normalizedId) return;
+    if (!normalizedId) {
+        state.pendingPushOpen = false;
+        try {
+            localStorage.removeItem("shadow_pending_push_chat");
+        } catch (e) {}
+        return;
+    }
 
     let attempts = 0;
     const maxAttempts = 20;
+
+    const clearPendingPush = function () {
+        state.pendingPushOpen = false;
+        try {
+            localStorage.removeItem("shadow_pending_push_chat");
+        } catch (e) {}
+    };
 
     const tryOpen = async function () {
         attempts++;
@@ -1003,37 +1016,38 @@ window.__openChatFromPush = async function (chatType, chatId) {
         if (!state.user) {
             if (attempts < maxAttempts) {
                 setTimeout(tryOpen, 700);
+            } else {
+                clearPendingPush();
             }
             return;
         }
 
         try {
             await loadAllChatSources();
-        if (!state.chatItems || !state.chatItems.length) {
-    if (attempts < maxAttempts) {
-        setTimeout(tryOpen, 700);
-    }
-    return;
-}
         } catch (e) {}
 
         const items = Array.isArray(state.chatItems) ? state.chatItems : [];
-        const item = items.find(function (c) {
+
+        const exactItem = items.find(function (c) {
             return String(c.id) === normalizedId && String(c.type) === normalizedType;
         });
 
-        if (item) {
-            try {
-                localStorage.removeItem("shadow_pending_push_chat");
-            } catch (e) {}
-            openChat(item.type, item.id);
-            state.pendingPushOpen = false;
+        const fallbackItem = exactItem || items.find(function (c) {
+            return String(c.id) === normalizedId;
+        });
+
+        if (fallbackItem) {
+            clearPendingPush();
+            openChat(fallbackItem.type, fallbackItem.id);
             return;
         }
 
         if (attempts < maxAttempts) {
             setTimeout(tryOpen, 700);
+            return;
         }
+
+        clearPendingPush();
     };
 
     tryOpen();
