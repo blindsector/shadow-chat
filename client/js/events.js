@@ -987,18 +987,25 @@ function showNotification(title, body) {
     }
 }
 
-window.__openChatFromPush = function (chatId) {
+window.__openChatFromPush = function (chatType, chatId) {
     if (!chatId) return;
 
     let attempts = 0;
-    const maxAttempts = 12;
+    const maxAttempts = 14;
 
-    const tryOpen = function () {
+    const tryOpen = async function () {
         attempts++;
+
+        try {
+            await loadAllChatSources();
+        } catch (e) {}
+
+        const normalizedType = String(chatType || "direct");
+        const normalizedId = String(chatId);
 
         const items = Array.isArray(state.chatItems) ? state.chatItems : [];
         const item = items.find(function (c) {
-            return String(c.id) === String(chatId);
+            return String(c.id) === normalizedId && String(c.type) === normalizedType;
         });
 
         if (item) {

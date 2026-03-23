@@ -172,6 +172,8 @@ def send_message():
         now_iso()
     ))
 
+    message_id = cur.lastrowid
+
     conn.commit()
     conn.close()
 
@@ -184,12 +186,17 @@ def send_message():
         send_push_to_user(
             int(receiver_id),
             sender_name,
-            "Имаш ново съобщение"
+            encoded_text,
+            chat_id=int(user["id"]),
+            chat_type="direct"
         )
     except Exception:
         pass
 
-    return jsonify({"ok": True})
+    return jsonify({
+        "ok": True,
+        "message_id": message_id
+    })
 
 
 def get_conversation():

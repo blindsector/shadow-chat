@@ -51,8 +51,8 @@ def _get_firebase_app():
         return None
 
 
-def send_push_to_user(user_id, title, body):
-    print("🚀 send_push_to_user:", user_id, title)
+def send_push_to_user(user_id, title, body, chat_id=None, chat_type="direct"):
+    print("🚀 send_push_to_user:", user_id, title, chat_id, chat_type)
 
     app = _get_firebase_app()
     if app is None:
@@ -76,6 +76,9 @@ def send_push_to_user(user_id, title, body):
         print("❌ No tokens for user")
         return
 
+    chat_id_str = "" if chat_id is None else str(chat_id)
+    chat_type_str = str(chat_type or "direct")
+
     for row in rows:
         token = row["token"]
         print("👉 Sending to token:", token[:20], "...")
@@ -95,8 +98,10 @@ def send_push_to_user(user_id, title, body):
                     )
                 ),
                 data={
-                    "title": title,
-                    "body": body
+                    "title": str(title or ""),
+                    "body": str(body or ""),
+                    "chat_id": chat_id_str,
+                    "chat_type": chat_type_str
                 }
             )
 
