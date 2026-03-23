@@ -60,11 +60,13 @@ function startPolling() {
         await loadAllChatSources();
         checkForNewMessagesAndNotify();
 
-        if (
+       const hasPendingPushTarget = !!state.pendingPushOpen || !!localStorage.getItem("shadow_pending_push_chat");
+
+if (
     chatRoomScreen.classList.contains("active") &&
     state.activeChatType &&
     state.activeChatId &&
-    !state.pendingPushOpen
+    !hasPendingPushTarget
 ) {
             if (state.activeChatType === "direct" && state.receiptsEnabled) {
                 try {
