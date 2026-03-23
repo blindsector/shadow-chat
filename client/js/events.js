@@ -875,17 +875,10 @@ messageInput.addEventListener("input", function () {
 
     
 
-    bindEncodedOverlayTapMove();
+bindEncodedOverlayTapMove();
 bindOverlayHideRevealGestures();
 bindPanicTrigger();
 syncComposerToolsVisibility();
-
-setTimeout(function () {
-    if (typeof window.__consumePendingPushChat === "function") {
-        window.__consumePendingPushChat();
-    }
-}, 1200);
-}
 
 setTimeout(function () {
     if (
@@ -895,6 +888,8 @@ setTimeout(function () {
         window.__consumePendingPushChat();
     }
 }, 2500);
+
+}
 
 function activatePanicMode() {
     state.panicMode = true;

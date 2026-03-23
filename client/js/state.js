@@ -24,6 +24,7 @@ const state = {
     panicMode: false,
     unlockPassword: "",
     notificationsEnabled: true,
+    pendingPushOpen: false,
 
     typingUsers: {},
     bubbleAvatarCache: {}

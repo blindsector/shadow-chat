@@ -1,4 +1,4 @@
-function startApp() {
+async function startApp() {
     bindEvents();
 
     state.onlineVisibilityEnabled = loadOnlineVisibilitySetting();
@@ -11,7 +11,20 @@ function startApp() {
         feedback.init();
     }
 
-    bootstrapSession();
+    try {
+        await bootstrapSession();
+    } catch (e) {
+        console.warn("bootstrapSession failed", e);
+    }
+
+    setTimeout(function () {
+        if (
+            typeof window.__consumePendingPushChat === "function" &&
+            localStorage.getItem("shadow_pending_push_chat")
+        ) {
+            window.__consumePendingPushChat();
+        }
+    }, 250);
 }
 
 startApp();
